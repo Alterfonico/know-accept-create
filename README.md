@@ -55,10 +55,12 @@ One breath before any input. One honest answer to:
 
 Not what should be true. Not what the narrative wants. What is.
 
+---
+
 ## The MVP
 
 Spreadsheet as database. Tally counter as UI.
-Emotional triggers. Timestamp. Context. Tags.
+Emotional triggers with timestamp, context and tags.
 
 Month one goal: **the habit of logging. Not the perfect log.**
 
@@ -70,6 +72,10 @@ At the end of each session, three questions close every cycle — a single commi
 2. Did we surface an assumption we hadn't seen before?
 3. Did the student move closer to reality or further from it?
 
+## Status
+
+Week one. Axiom holding.
+
 ---
 
-_**Status:** Week one. Axiom holding._
+_Your confusion is as valuable as your conclusions to someone six months behind you on the same path. If that's you — everything here is for you._
