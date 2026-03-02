@@ -1,4 +1,5 @@
 # Session 04 — March 2, 2026
+
 ## Zone A Goes Live
 
 **Opened with:** A trinary function specification called the Nursery Gate.
@@ -15,12 +16,14 @@ The sabotage pattern appeared once — session close ranked last.
 Named, witnessed, not acted on.
 
 **Produced:**
+
 - `architecture/ADR-002-zone-a-input-gate.md` — trinary input spec
 - `architecture/ADR-003-roadmap.md` — full 11-stage system map
 - `logs/2026-03-02.md` — first signal, gate confirmed open
 - `sessions/session-04.md` — this document
 
 **Two fixes pending before Zone A is fully clean:**
+
 - `state` variable mapping in Shortcuts
 - ISO 8601 timestamp format
 
