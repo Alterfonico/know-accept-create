@@ -1,7 +1,7 @@
 # ADR-003: System Roadmap
 
 **Date:** 2026-03-02
-**Status:** Accepted
+**Status:** Updated 2026-03-03
 **Domain:** System Architecture
 
 ---
@@ -23,19 +23,21 @@ Stage 0   Foundation
 Stage 1   Zone A — Nursery Gate
           Trinary input. iPhone shortcut.
           Telegram as proof of life channel.
-          ↑ Current — state variable fix pending
+          ✓ Complete
 
 Stage 2   Zone B — Processing Layer
           n8n webhook receives the signal.
           First automation logic. Routes to Zone C.
+          ✓ Complete
 
 Stage 3   Zone C — Tally Ledger
           Google Sheets as database.
           Longitudinal pattern storage begins.
           The system starts remembering.
+          ↑ Current — database is listening.
 
 Stage 4   Zone A Upgrade — Body-First Capture
-          Smartwatch gesture input.
+          Gesture input.
           Built from three months of friction data.
 
 Stage 5   Pattern Recognition
