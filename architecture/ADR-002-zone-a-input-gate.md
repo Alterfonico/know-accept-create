@@ -1,7 +1,7 @@
 # ADR-002: Zone A — The Nursery Gate
 
 **Date:** 2026-03-01  
-**Status:** Accepted  
+**Status:** Updated 2026-03-03
 **Domain:** Input Architecture
 
 ---
@@ -23,7 +23,7 @@ A deterministic state machine. Three discrete integers. Nothing else.
 ```
 Zone A  →  Zone B  →  Zone C
 Input      Process    Ledger
-Gate       Agent      Tally
+Gate       n8n        Tally
 ```
 
 ---
@@ -34,8 +34,7 @@ Gate       Agent      Tally
 {
   "state": 0 | 1 | 2,
   "timestamp": "ISO 8601",
-  "device": "watch" | "phone" | "web",
-  "tags": []
+  "device": "computer" | "mobile" | "other"
 }
 ```
 
@@ -54,9 +53,12 @@ State must be within `{0,1,2}` before transmission. On rejection — silent log,
 - `context` field captures dual-channel source — user-initiated vs system-prompted signals are stored together, queried separately in Zone C
 - Rejection behavior defined at the boundary
 - Tags deferred to v1.1
+- `device` field formally documented: `mac`, `phone`, `other`
+  `mac` confirmed in production 2026-03-02
 
 ---
 
 ## What This Is Not
 
-A mood app. The payload carries no interpretation. Meaning lives downstream, never at the gate.
+A mood app. The payload carries no interpretation.
+Meaning lives downstream, never at the gate.
