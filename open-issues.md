@@ -8,7 +8,7 @@ Known open issues. Not blockers. Logged so they cannot hide.
 
 ## Zone A
 
-- [ ] Bot token exposed in screenshot — regenerate via @BotFather
+- [x] Bot token regenerated 2026-03-04 — stored in Notion, not shared
 - [ ] `tags: []` not yet wired into the pipeline — deferred to v1.1
 
 ---
