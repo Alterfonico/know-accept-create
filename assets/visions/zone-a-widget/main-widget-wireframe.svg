@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+
+  <!-- Background blob shape -->
+  <rect x="30" y="30" width="240" height="240" rx="80" ry="80"
+    fill="#f5f5f5" stroke="#333" stroke-width="2" stroke-dasharray="6,3"/>
+
+  <!-- Center button (highlighted) -->
+  <rect x="110" y="110" width="80" height="80" rx="20" ry="20"
+    fill="white" stroke="#333" stroke-width="2"/>
+  <!-- Plus icon -->
+  <line x1="150" y1="132" x2="150" y2="168" stroke="#333" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="132" y1="150" x2="168" y2="150" stroke="#333" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="150" y="205" text-anchor="middle" font-size="9" fill="#999" font-family="sans-serif">primary action</text>
+
+  <!-- Top-left: Checkmark -->
+  <circle cx="75" cy="75" r="22" fill="none" stroke="#333" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <polyline points="65,75 72,83 86,66" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="75" y="110" text-anchor="middle" font-size="8" fill="#999" font-family="sans-serif">confirm</text>
+
+  <!-- Top-right: Pencil -->
+  <circle cx="225" cy="75" r="22" fill="none" stroke="#333" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <line x1="216" y1="84" x2="228" y2="66" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <line x1="213" y1="87" x2="216" y2="84" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="228" y1="66" x2="234" y2="63" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+  <text x="225" y="110" text-anchor="middle" font-size="8" fill="#999" font-family="sans-serif">edit</text>
+
+  <!-- Bottom-left: Microphone -->
+  <circle cx="75" cy="225" r="22" fill="none" stroke="#333" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <rect x="70" y="214" width="10" height="14" rx="5" fill="none" stroke="#333" stroke-width="1.8"/>
+  <path d="M65,226 Q65,234 75,234 Q85,234 85,226" fill="none" stroke="#333" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="75" y1="234" x2="75" y2="238" stroke="#333" stroke-width="1.8" stroke-linecap="round"/>
+  <text x="75" y="258" text-anchor="middle" font-size="8" fill="#999" font-family="sans-serif">voice</text>
+
+  <!-- Bottom-right: Camera -->
+  <circle cx="225" cy="225" r="22" fill="none" stroke="#333" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <rect x="213" y="219" width="24" height="16" rx="3" fill="none" stroke="#333" stroke-width="1.8"/>
+  <circle cx="225" cy="227" r="4" fill="none" stroke="#333" stroke-width="1.5"/>
+  <polyline points="220,219 222,215 228,215 230,219" fill="none" stroke="#333" stroke-width="1.5" stroke-linejoin="round"/>
+  <text x="225" y="258" text-anchor="middle" font-size="8" fill="#999" font-family="sans-serif">camera</text>
+
+</svg>
