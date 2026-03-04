@@ -69,6 +69,17 @@ Deno.serve(async (req: Request): Promise<Response> => {
     const messageTs: string = event.ts;
     if (!messageText || messageText.trim() === "") return new Response("ok", { status: 200 });
 
+    //Skip if this Slack message was already ingested (deduplication via slack_ts)
+    const { data: existing } = await supabase
+      .from("thoughts")
+      .select("id")
+      .eq("metadata->>slack_ts", messageTs)
+      .limit(1);
+    if (existing && existing.length > 0) {
+      console.log(`Duplicate event for slack_ts ${messageTs}, skipping.`);
+      return new Response("ok", { status: 200 });
+    }
+    
     const [embedding, metadata] = await Promise.all([
       getEmbedding(messageText),
       extractMetadata(messageText),
