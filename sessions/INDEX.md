@@ -9,8 +9,10 @@ A chronological narrative of each session. A witnessed record of how the system 
 5. Mar 03 — Zone B and C complete, pipeline end to end
 6. Mar 03 — Open Brain mapped to spiral
 7. Mar 03 — Supabase provisioned, pgvector enabled
-8. Mar 04 —
-9. Mar 04 — Zone A widget
+8. Mar 04 — City vision mapped, Hathor surfaced
+9. Mar 04 — Zone A widget mapped, open-brain explored from inside
+10. Mar 04 — Custom MCP blocked, Meverse finds its voice
+11. Mar 04 — Project infrastructure set, memory anchored
 
 ---
 
