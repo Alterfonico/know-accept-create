@@ -1,4 +1,4 @@
-# Session 12 — 2026-03-04
+# Session 12 — 2026-03-05
 
 ## The receiver — where Meverse fits in 100 years of Chaos Magic
 
