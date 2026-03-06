@@ -94,6 +94,10 @@ Meverse v0.3 — Visual identity
 8-bit pixel art, six canonical screens
 The product has a face now
 
+Meverse v0.3.1 — First working prototype
+Stats screen functional
+Figma Make / React + TypeScript
+
 **Date:** 2026-03-06
 **Status:** First visual identity — not validated by users yet
 **Based on:** 8-bit pixel art generation, six canonical screens
