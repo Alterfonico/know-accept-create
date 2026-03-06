@@ -14,6 +14,9 @@ A chronological narrative of each session. A witnessed record of how the system 
 10. Mar 04 — Custom MCP blocked, Meverse finds its voice
 11. Mar 05 — Project infrastructure set, memory anchored
 12. Mar 05 — The receiver — Meverse and 100 years of Chaos Magic
+13. Mar 06 — Meverse takes shape — screen brief, four screens pressure tested
+14. Mar 06 — Meverse v0.3 — lo-fi wireframe, diamond logo candidate
+15. Mar 06 — Stats screen fully designed — heatmap, incident log modal, UI spec locked
 
 ---
 
