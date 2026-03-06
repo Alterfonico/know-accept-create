@@ -28,7 +28,7 @@ Screen brief v0.1 written and committed to assets/meverse/.
 **Produced:**
 
 - Screen brief v0.1 — four screens documented
-- `assets/meverse/screen-brief-v0.1.md` committed
+- `assets/meverse/screen-brief.md` committed
 
 **Open question:**
 Which screen goes to v0 or Figma AI first —

@@ -23,7 +23,8 @@ no promises, just the door.
 
 - Lo-fi wireframe v0.3 — two screens, design tool
 - Meverse logo candidate — diamond mark
-- assets/meverse/screens-v0.3 committed
+- `assets/meverse/screens-v0.3` committed
+- `assets/meverse/screen-brief.md` updated
 
 **Open question:**
 Is the diamond the logo or a placeholder?
