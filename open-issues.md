@@ -19,11 +19,12 @@ Known open issues. Not blockers. Logged so they cannot hide.
 ## Zone C
 
 - [ ] Column order in ZONE_A sheet inconsistent with ADR-002 spec
-      ADR has `state` first, sheet has `timestamp` first
+      ADR has `state` first, sheet has `timestamp` first. Review redundant columns.
 - [ ] `status` and `friction` columns empty and unspecified —
       decide: keep as human-maintained fields or remove
 - [x] Retroactive Golden Spreadsheet import to Supabase — 39 rows inserted 2026-03-07
 - [ ] Batch embedding pass — generate vectors for all null embeddings (Stage 6)
+- [ ] Figma file showing real data
 
 ## Other
 
