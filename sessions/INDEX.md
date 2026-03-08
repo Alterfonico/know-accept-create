@@ -21,6 +21,8 @@ A chronological narrative of each session. A witnessed record of how the system 
 17. Mar 07 — Retroactive data imported — 58 rows in Supabase, two CSVs processed
 18. Mar 07 — Claude Skills explored, first 2 skills set, workflow friction named
 19. Mar 08 — Stage 4 spec locked, 4 new columns added to `thoughts` table in Supabase.
+20. Mar 08 — Android capture wired to Supabase direct
+21. Mar 08 — UX architecture mapped as three-act loop, Act II resolved — breath bubble, #scalability locked
 
 ---
 
