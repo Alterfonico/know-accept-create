@@ -23,6 +23,7 @@ A chronological narrative of each session. A witnessed record of how the system 
 19. Mar 08 — Stage 4 spec locked, 4 new columns added to `thoughts` table in Supabase.
 20. Mar 08 — Android capture wired to Supabase direct
 21. Mar 08 — UX architecture mapped as three-act loop, Act II resolved — breath bubble, #scalability locked
+22. Mar 08 — The Corkboard Problem — parking protocol v1 designed for parallel thread management
 
 ---
 
