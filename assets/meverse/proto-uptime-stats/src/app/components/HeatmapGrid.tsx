@@ -1,11 +1,23 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
 type Status = "up" | "down" | "warning" | "empty";
+
+interface Incident {
+  id?: string;
+  created_at: string;
+  content: string;
+  metadata?: {
+    status?: Status;
+    uptime_pct?: number;
+    service?: string;
+  };
+}
 
 interface DayCell {
   status: Status;
   uptime?: number;
   day?: number;
+  rawIncidents?: Incident[];
 }
 
 interface MonthData {
@@ -27,39 +39,6 @@ const STATUS_LABELS: Record<Status, string> = {
   empty: "NO DATA",
 };
 
-function generateMonthData(monthName: string, daysInMonth: number, offset: number): MonthData {
-  const cells: DayCell[] = [];
-
-  for (let i = 0; i < 35; i++) {
-    const dayNum = i - offset + 1;
-    if (i < offset || dayNum > daysInMonth) {
-      cells.push({ status: "empty" });
-    } else {
-      const rand = Math.random();
-      let status: Status;
-      let uptime: number;
-      if (rand > 0.85) {
-        status = "down";
-        uptime = Math.floor(Math.random() * 40);
-      } else if (rand > 0.65) {
-        status = "warning";
-        uptime = Math.floor(60 + Math.random() * 35);
-      } else {
-        status = "up";
-        uptime = Math.floor(95 + Math.random() * 5);
-      }
-      cells.push({ status, uptime, day: dayNum });
-    }
-  }
-  return { name: monthName, cells };
-}
-
-const MONTHS_DATA: MonthData[] = [
-  generateMonthData("JAN 2026", 31, 3),
-  generateMonthData("FEB 2026", 28, 0),
-  generateMonthData("MAR 2026", 31, 0),
-];
-
 interface TooltipState {
   visible: boolean;
   x: number;
@@ -70,7 +49,7 @@ interface TooltipState {
   month?: string;
 }
 
-export function HeatmapGrid() {
+export function HeatmapGrid({ incidents = [] }: { incidents?: Incident[] }) {
   const [tooltip, setTooltip] = useState<TooltipState>({
     visible: false,
     x: 0,
@@ -81,7 +60,7 @@ export function HeatmapGrid() {
   const handleMouseEnter = (
     e: React.MouseEvent,
     cell: DayCell,
-    monthName: string
+    monthName: string,
   ) => {
     if (cell.status === "empty") return;
     const rect = (e.target as HTMLElement).getBoundingClientRect();
@@ -104,11 +83,89 @@ export function HeatmapGrid() {
     visible: boolean;
     cell: DayCell | null;
     monthName: string;
+    incidents?: Incident[];
   }>({
     visible: false,
     cell: null,
     monthName: "",
+    incidents: [],
   });
+
+  const monthsData = React.useMemo(() => {
+    const today = new Date();
+    // Normalize today to start of day for comparison
+    today.setHours(0, 0, 0, 0);
+
+    const generateMonthDataLive = (
+      year: number,
+      monthIndex: number,
+      monthName: string,
+    ): MonthData => {
+      const cells: DayCell[] = [];
+      const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+      // Sunday-start week: getDay() already returns Sun = 0
+      const offset = new Date(year, monthIndex, 1).getDay();
+
+      // Calculate total rows needed (42 cells = 6 rows of 7 days)
+      const totalCells = 42;
+
+      for (let i = 0; i < totalCells; i++) {
+        const dayNum = i - offset + 1;
+        if (i < offset || dayNum > daysInMonth) {
+          cells.push({ status: "empty" });
+        } else {
+          const cellDate = new Date(year, monthIndex, dayNum);
+          if (cellDate > today) {
+            // Future date
+            cells.push({ status: "empty", day: dayNum });
+            continue;
+          }
+
+          const dayIncidents = incidents.filter((inc) => {
+            if (!inc.created_at) return false;
+            const d = new Date(inc.created_at);
+            return (
+              d.getFullYear() === year &&
+              d.getMonth() === monthIndex &&
+              d.getDate() === dayNum
+            );
+          });
+
+          let status: Status = "up";
+          let uptime = 100;
+
+          if (dayIncidents.length > 0) {
+            if (dayIncidents.some((inc) => inc.metadata?.status === "down")) {
+              status = "down";
+            } else if (
+              dayIncidents.some((inc) => inc.metadata?.status === "warning")
+            ) {
+              status = "warning";
+            }
+            const totalUptime = dayIncidents.reduce(
+              (sum, inc) => sum + (inc.metadata?.uptime_pct ?? 100),
+              0,
+            );
+            uptime = Math.floor(totalUptime / dayIncidents.length);
+          }
+
+          cells.push({
+            status,
+            uptime,
+            day: dayNum,
+            rawIncidents: dayIncidents,
+          });
+        }
+      }
+      return { name: monthName, cells };
+    };
+
+    return [
+      generateMonthDataLive(2026, 0, "JAN 2026"),
+      generateMonthDataLive(2026, 1, "FEB 2026"),
+      generateMonthDataLive(2026, 2, "MAR 2026"),
+    ];
+  }, [incidents]);
 
   return (
     <div className="relative w-full">
@@ -157,7 +214,7 @@ export function HeatmapGrid() {
             <div className="space-y-3">
               <div className="text-[#9D50BB] text-[10px]">INCIDENT LOG:</div>
               <div
-                className="p-3 text-[8px] leading-loose"
+                className="p-3 text-[8px] leading-loose max-h-40 overflow-y-auto"
                 style={{
                   backgroundColor: "#000000",
                   border: "2px solid #333333",
@@ -165,30 +222,32 @@ export function HeatmapGrid() {
                     selectedCell.cell.status === "up"
                       ? STATUS_COLORS.up
                       : selectedCell.cell.status === "warning"
-                      ? STATUS_COLORS.warning
-                      : STATUS_COLORS.down,
+                        ? STATUS_COLORS.warning
+                        : STATUS_COLORS.down,
                 }}
               >
-                {selectedCell.cell.status === "up" ? (
-                  <>
-                    &gt; [00:00] SYSTEM INITIALIZED<br />
-                    &gt; [08:00] NOMINAL OPERATION<br />
-                    &gt; [16:00] ROUTINE CHECK PASS<br />
-                    &gt; [23:59] CYCLE COMPLETE
-                  </>
-                ) : selectedCell.cell.status === "warning" ? (
-                  <>
-                    &gt; [04:22] LATENCY SPIKE DETECTED<br />
-                    &gt; [04:25] RE-ROUTING TRAFFIC<br />
-                    &gt; [05:10] PERFORMANCE DEGRADED<br />
-                    &gt; [11:45] SYSTEM STABILIZING...
-                  </>
+                {selectedCell.incidents && selectedCell.incidents.length > 0 ? (
+                  selectedCell.incidents.map((inc, i) => (
+                    <div key={inc.id || i} className="mb-2">
+                      &gt; [
+                      {new Date(inc.created_at).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                      })}
+                      ] {inc.metadata?.service?.toUpperCase() || "SYSTEM"}:{" "}
+                      {inc.content}
+                    </div>
+                  ))
                 ) : (
                   <>
-                    &gt; [09:15] CRITICAL FAILURE<br />
-                    &gt; [09:16] CONNECTION LOST<br />
-                    &gt; [10:30] ATTEMPTING REBOOT<br />
-                    &gt; [14:20] PARTIAL RECOVERY
+                    &gt; [00:00] SYSTEM INITIALIZED
+                    <br />
+                    &gt; [08:00] NOMINAL OPERATION
+                    <br />
+                    &gt; [16:00] ROUTINE CHECK PASS
+                    <br />
+                    &gt; [23:59] CYCLE COMPLETE
                   </>
                 )}
               </div>
@@ -197,7 +256,10 @@ export function HeatmapGrid() {
             <div className="mt-6 flex justify-end">
               <button
                 className="px-4 py-2 text-[8px] text-[#1A1A1A] hover:bg-[#9D50BB] hover:text-white transition-colors"
-                style={{ backgroundColor: "#FFD700", border: "2px solid #FFD700" }}
+                style={{
+                  backgroundColor: "#FFD700",
+                  border: "2px solid #FFD700",
+                }}
                 onClick={() =>
                   setSelectedCell({ visible: false, cell: null, monthName: "" })
                 }
@@ -242,7 +304,7 @@ export function HeatmapGrid() {
 
       {/* Grid */}
       <div className="flex gap-4 justify-center">
-        {MONTHS_DATA.map((month) => (
+        {monthsData.map((month) => (
           <div key={month.name} className="flex flex-col gap-3 flex-1 min-w-0">
             {/* Month Label */}
             <div
@@ -259,8 +321,8 @@ export function HeatmapGrid() {
             </div>
 
             {/* Day-of-week headers */}
-            <div className="grid grid-cols-5 gap-1">
-              {["M", "T", "W", "T", "F"].map((d, i) => (
+            <div className="grid grid-cols-7 gap-1">
+              {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
                 <div
                   key={i}
                   className="text-center text-[6px]"
@@ -274,8 +336,8 @@ export function HeatmapGrid() {
               ))}
             </div>
 
-            {/* Pixel Grid: 5 cols x 7 rows */}
-            <div className="grid grid-cols-5 gap-1">
+            {/* Pixel Grid: 7 cols */}
+            <div className="grid grid-cols-7 gap-1">
               {month.cells.map((cell, idx) => (
                 <div
                   key={idx}
@@ -304,14 +366,17 @@ export function HeatmapGrid() {
                         visible: true,
                         cell,
                         monthName: month.name,
+                        incidents: cell.rawIncidents || [],
                       });
                     }
                   }}
                   onMouseDown={(e) => {
-                    (e.currentTarget as HTMLElement).style.transform = "scale(0.85)";
+                    (e.currentTarget as HTMLElement).style.transform =
+                      "scale(0.85)";
                   }}
                   onMouseUp={(e) => {
-                    (e.currentTarget as HTMLElement).style.transform = "scale(1)";
+                    (e.currentTarget as HTMLElement).style.transform =
+                      "scale(1)";
                   }}
                 />
               ))}
@@ -325,11 +390,13 @@ export function HeatmapGrid() {
                 color: "#9D50BB",
               }}
             >
-              {Math.floor(
-                (month.cells.filter((c) => c.status === "up").length /
-                  month.cells.filter((c) => c.status !== "empty").length) *
-                  100
-              )}
+              {month.cells.filter((c) => c.status !== "empty").length > 0
+                ? Math.floor(
+                    (month.cells.filter((c) => c.status === "up").length /
+                      month.cells.filter((c) => c.status !== "empty").length) *
+                      100,
+                  )
+                : 100}
               % UP
             </div>
           </div>

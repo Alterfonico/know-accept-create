@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Meverse — UX Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0A0A0F;
+    color: #E0E0E0;
+    font-family: 'IBM Plex Mono', monospace;
+    padding: 40px 32px 60px;
+    min-height: 100vh;
+  }
+
+  header { margin-bottom: 32px; }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #fff;
+  }
+
+  .subtitle {
+    font-size: 11px;
+    color: #444;
+    letter-spacing: 2px;
+    margin-top: 6px;
+  }
+
+  .legend {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+  }
+
+  .dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+  }
+
+  .legend-label { font-weight: 600; }
+  .legend-desc { color: #444; }
+
+  .acts { display: flex; flex-direction: column; gap: 20px; }
+
+  .act {
+    border-radius: 10px;
+    padding: 28px 24px;
+    position: relative;
+  }
+
+  .act-1 { background: rgba(125,249,194,0.03); border: 1px solid rgba(125,249,194,0.08); }
+  .act-2 { background: rgba(255,209,102,0.03); border: 1px solid rgba(255,209,102,0.08); }
+  .act-3 { background: rgba(167,139,250,0.03); border: 1px solid rgba(167,139,250,0.08); }
+
+  .act-tag {
+    position: absolute;
+    top: 12px; right: 16px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    opacity: 0.5;
+  }
+
+  .act-1 .act-tag { color: #7DF9C2; }
+  .act-2 .act-tag { color: #FFD166; }
+  .act-3 .act-tag { color: #A78BFA; }
+
+  .flow {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    flex-wrap: wrap;
+  }
+
+  .flow-main {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .node {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 16px;
+    border-radius: 6px;
+    font-size: 11px;
+    background: #11111a;
+    transition: all 0.2s;
+    white-space: nowrap;
+    cursor: default;
+    min-width: 120px;
+    text-align: center;
+  }
+
+  .node:hover { background: #1a1a2e; filter: brightness(1.2); }
+
+  .node-1 { border: 1.5px solid rgba(125,249,194,0.7); color: #ccc; }
+  .node-2 { border: 1.5px solid rgba(255,209,102,0.7); color: #ccc; }
+  .node-3 { border: 1.5px solid rgba(167,139,250,0.7); color: #ccc; }
+
+  .node-resolved {
+    border: 1.5px solid rgba(255,209,102,0.9);
+    color: #FFD166;
+    position: relative;
+  }
+
+  .node-resolved::after {
+    content: '✓';
+    position: absolute;
+    top: -8px; right: -8px;
+    font-size: 9px;
+    background: #FFD166;
+    color: #0A0A0F;
+    width: 15px; height: 15px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+
+  .arrow {
+    color: #333;
+    font-size: 16px;
+    padding: 0 8px;
+    user-select: none;
+    flex-shrink: 0;
+  }
+
+  .branch-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-left: 8px;
+  }
+
+  .branch-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .node-variant {
+    border: 1.5px dashed;
+    opacity: 0.55;
+    font-size: 10px;
+    min-width: 110px;
+  }
+
+  .node-variant:hover { opacity: 1; }
+  .node-variant.v1 { border-color: rgba(125,249,194,0.5); color: #aaa; }
+  .node-variant.v2 { border-color: rgba(255,209,102,0.5); color: #aaa; }
+
+  .q-mark {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1px solid #333;
+    background: #0A0A0F;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: #444;
+    flex-shrink: 0;
+    margin: 0 8px;
+  }
+
+  .variant-label {
+    font-size: 8px;
+    color: #555;
+    letter-spacing: 1.5px;
+    margin-bottom: 2px;
+    padding-left: 4px;
+  }
+
+  /* Breath bubble node */
+  .node-bubble {
+    border: 1.5px solid rgba(255,209,102,0.9);
+    color: #FFD166;
+    border-radius: 50px;
+    font-size: 10px;
+    padding: 9px 20px;
+    position: relative;
+    background: rgba(255,209,102,0.05);
+  }
+
+  .bubble-tag {
+    font-size: 8px;
+    color: #FFD166;
+    opacity: 0.6;
+    letter-spacing: 1px;
+    margin-left: 6px;
+  }
+
+  .resolved-note {
+    font-size: 10px;
+    color: #FFD166;
+    opacity: 0.5;
+    margin-top: 10px;
+    letter-spacing: 1px;
+  }
+
+  .act-3-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+  }
+
+  .fork {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-left: 8px;
+  }
+
+  footer {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid #1a1a1a;
+    font-size: 11px;
+    color: #2a2a2a;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>MEVERSE — UX ARCHITECTURE</h1>
+  <p class="subtitle">THREE-ACT LOOP · VARIANTS SHOWN AS DASHED · ✓ = RESOLVED</p>
+</header>
+
+<div class="legend">
+  <div class="legend-item">
+    <div class="dot" style="background:#7DF9C2"></div>
+    <span class="legend-label" style="color:#7DF9C2">ACT I — Hook</span>
+    <span class="legend-desc">— Acquisition + first signal</span>
+  </div>
+  <div class="legend-item">
+    <div class="dot" style="background:#FFD166"></div>
+    <span class="legend-label" style="color:#FFD166">ACT II — Ritual</span>
+    <span class="legend-desc">— Daily capture loop</span>
+  </div>
+  <div class="legend-item">
+    <div class="dot" style="background:#A78BFA"></div>
+    <span class="legend-label" style="color:#A78BFA">ACT III — Mirror</span>
+    <span class="legend-desc">— Pattern → meaning</span>
+  </div>
+</div>
+
+<div class="acts">
+
+  <!-- ACT I -->
+  <div class="act act-1">
+    <span class="act-tag">ACT I — HOOK</span>
+    <div class="flow">
+      <div class="flow-main">
+        <div class="node node-1">Splash Screen</div>
+        <span class="arrow">→</span>
+        <div class="node node-1">Register / Login</div>
+        <span class="arrow">→</span>
+        <div class="node node-1">First Capture</div>
+        <div class="q-mark">?</div>
+      </div>
+      <div class="branch-block">
+        <div class="variant-label">VARIANT</div>
+        <div class="branch-row">
+          <div class="node node-variant v1">Home / Log List</div>
+        </div>
+        <div class="branch-row">
+          <div class="node node-variant v1">Onboarding Prompt</div>
+        </div>
+        <div class="branch-row">
+          <div class="node node-variant v1">Instant Analysis</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACT II -->
+  <div class="act act-2">
+    <span class="act-tag">ACT II — RITUAL</span>
+    <div class="flow">
+      <div class="flow-main">
+        <div class="node node-2">Lock Screen Widget</div>
+        <span class="arrow">→</span>
+        <div class="node node-2">Input (Auto-save)</div>
+        <span class="arrow">→</span>
+        <div class="node node-2">Save / Cancel</div>
+        <span class="arrow">→</span>
+        <div class="node node-bubble node-resolved">
+          inhale · exhale 3s
+          <span class="bubble-tag">dissolves</span>
+        </div>
+        <span class="arrow">→</span>
+        <div class="node node-2">Lock Screen</div>
+      </div>
+    </div>
+    <p class="resolved-note">✓ RESOLVED — somatic punctuation, no AI at this stage</p>
+  </div>
+
+  <!-- ACT III -->
+  <div class="act act-3">
+    <span class="act-tag">ACT III — MIRROR</span>
+    <div class="act-3-flow">
+      <div class="node node-3">Log List</div>
+      <span class="arrow">→</span>
+      <div class="node node-3">Side Nav</div>
+      <span class="arrow">→</span>
+      <div class="fork">
+        <div class="node node-3">Uptime Visualization</div>
+        <div class="node node-3">Fractal Map View</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  ACT I — ? OPEN &nbsp;·&nbsp; ACT II — ✓ RESOLVED &nbsp;·&nbsp; ACT III — ? OPEN
+</footer>
+
+</body>
+</html>
