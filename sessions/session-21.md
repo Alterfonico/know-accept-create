@@ -1,7 +1,8 @@
-# Session 1 — 2026-03-08
+# Session 21 — 2026-03-08
+
 ## Mapping the three-act loop and resolving Act II post-save destination
 
-**State on arrival:** Big picture shared for the first time — diagram in hand, two unresolved `?` transitions, no code yet.
+**State on arrival:** Big picture shared for the first time in this thread — diagram in hand, two unresolved `?` transitions, live codebase already behind it.
 
 **What happened:**
 Laid out the full UX architecture as a three-act loop: Hook (acquisition), Ritual (daily capture), Mirror (AI pattern reading). Identified the two open transitions — post-first-capture and post-save/cancel — and chose to crack Act II first, since it fires every day and sets the emotional tone of the product.
@@ -11,10 +12,12 @@ Explored three variants for post-save destination: back to lock screen (cold), l
 Side thread: caught AI defaulting to React for a visual diagram that needed only HTML/CSS. Tagged as #scalability — AI over-engineers by instinct. Flagged for all future proposals.
 
 **Produced:**
+
 - Flow diagram built as React component (Vite), then identified as over-engineered
 - Rebuilt as single HTML file — `meverse-flow.html` — no framework, opens in any browser
 - Act II resolved: somatic breath bubble, auto-dissolves, returns to lock screen
 - #scalability insight logged and saved to memory
+- SESSION closing ritual established: INDEX.md updated + git push as standard session close
 
 **Open question:**
-What lives at the `?` after First Capture — and does the answer change if the user signed up vs. was invited?
+What lives at the `?` after First Capture — and is the answer the same for every user?
