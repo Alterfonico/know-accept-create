@@ -1,6 +1,6 @@
 # open-issues.md
 
-**Last updated:** 2026-03-06
+**Last updated:** 2026-03-09
 
 Known open issues. Not blockers. Logged so they cannot hide.
 
@@ -29,6 +29,22 @@ Known open issues. Not blockers. Logged so they cannot hide.
 ## Other
 
 - [ ] assets/ folder bloated — 116% of repo size, consider GitHub LFS or external storage
+
+---
+
+## Mockup (as of v0.14.0 · 2026-03-09)
+
+- [ ] Pill sheet (secondary input on Insights) uses old expanded layout —
+      not yet aligned to single-row input bar introduced in v0.10.0
+- [ ] "inquiry about node" button on pill sheet is disabled — path undefined,
+      needs a decision before next stress test trigger
+- [ ] Auth screen does not differentiate register vs login flow —
+      both currently route to #capture. Fine for mockup; needs branching before dev
+- [ ] `wall-to-lopath` JS handler is orphaned — references a button removed
+      in v0.9.0. Harmless but should be cleaned before dev handoff
+- [ ] Act II post-save destination unresolved — breath cue removed in v0.9.0,
+      no replacement defined. Loop currently closes silently after send
+- [ ] Local Fractal threshold (exact entry count) not yet defined
 
 ---
 
