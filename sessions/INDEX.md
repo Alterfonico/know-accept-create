@@ -25,7 +25,9 @@ A chronological narrative of each session. A witnessed record of how the system 
 21. Mar 08 — UX architecture mapped as three-act loop, Act II resolved — breath bubble, #scalability locked
 22. Mar 08 — The Corkboard Problem — parking protocol v1 designed for parallel thread management
 23. Mar 09 — Act I resolved — engagement gate, voltage branches, onboarding exit; Act II tightened
-24. []
+24. Mar 09 — Three-act UX mapped to completion · ADR-002 amended · ADR-004 drafted
+25. Mar 09 — CSS mockups,
+26. Mar XX — [...]
 
 ---
 
