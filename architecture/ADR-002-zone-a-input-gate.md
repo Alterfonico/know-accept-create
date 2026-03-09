@@ -1,7 +1,7 @@
 # ADR-002: Zone A — The Nursery Gate
 
 **Date:** 2026-03-01  
-**Status:** Updated 2026-03-03
+**Status:** Updated 2026-03-09
 **Domain:** Input Architecture
 
 ---
@@ -15,6 +15,31 @@ A deterministic state machine. Three discrete integers. Nothing else.
 1 = LIFE   — baseline, maturation, the smile
 2 = UPSET  — erosion, stress, the frown
 ```
+
+---
+
+## The Layering Model
+
+The three integers are not arbitrary. They descend from a single metaphysical root through three altitudes of meaning. Each layer is a reframe of the same value — not a different value.
+
+```
+Layer 0 — Metaphysical
+0 = infinite potential
+1 = polarity A
+2 = polarity B
+
+Layer 1 — Biological / Emotional  (this file)
+0 = POKE   — contact, communication, presence
+1 = LIFE   — the smile, maturation, baseline
+2 = UPSET  — erosion, stress, dead
+
+Layer 2 — UX / Mobile  (see ADR-004)
+0 = FLAT   — showed up, no clear state
+1 = HI     — alive, present, charged
+2 = LO     — depleted, eroded
+```
+
+The database stores the integer. The layer determines how it is read. There is no translation — only altitude.
 
 ---
 
@@ -53,7 +78,7 @@ State must be within `{0,1,2}` before transmission. On rejection — silent log,
 - `context` field captures dual-channel source — user-initiated vs system-prompted signals are stored together, queried separately in Zone C
 - Rejection behavior defined at the boundary
 - Tags deferred to v1.1
-- `device` field formally documented: `mac`, `phone`, `other`
+- `device` field formally documented: `mac`, `phone`, `other`  
   `mac` confirmed in production 2026-03-02
 
 ---
