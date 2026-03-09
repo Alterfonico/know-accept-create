@@ -26,8 +26,11 @@ A chronological narrative of each session. A witnessed record of how the system 
 22. Mar 08 — The Corkboard Problem — parking protocol v1 designed for parallel thread management
 23. Mar 09 — Act I resolved — engagement gate, voltage branches, onboarding exit; Act II tightened
 24. Mar 09 — Three-act UX mapped to completion · ADR-002 amended · ADR-004 drafted
-25. Mar 09 — CSS mockups,
-26. Mar XX — [...]
+25. Mar 09 — CSS mockups v0.2.0
+26. Mar 09 — Mockup v0.4.0→v0.6.0 · UX map stress tested · design principles locked
+27. Mar 09 — Mockup sprint v0.7.0→v0.14.0, JS layer introduced, light mode shipped
+28. Mar XX — [...]
+29. Mar XX — [...]
 
 ---
 
