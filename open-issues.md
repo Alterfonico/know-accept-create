@@ -45,6 +45,7 @@ Known open issues. Not blockers. Logged so they cannot hide.
 - [ ] Act II post-save destination unresolved — breath cue removed in v0.9.0,
       no replacement defined. Loop currently closes silently after send
 - [ ] Local Fractal threshold (exact entry count) not yet defined
+- [ ] "inquiry about node" as future feature
 
 ---
 
