@@ -1,4 +1,4 @@
-# Project Instructions for Cloude
+# Project Instructions for Claude
 
 **Date:** 2026-03-05
 **Status:** Updated 2026-03-06
@@ -40,6 +40,22 @@ If the session is cut short, append before closing:
 Stopped at: [one sentence]
 Resume at: [one sentence — next action]
 ```
+
+**Commit convention:**
+
+| Prefix | Use |
+|---|---|
+| `sessions:` | session files + INDEX |
+| `design:` | mockups, flows, screens, visions |
+| `arch:` | ADRs + UX maps |
+| `log:` | open-issues, daily logs |
+| `chore:` | tooling, gitignore, cleanup |
+| `feat:` | new working code |
+| `fix:` | corrections |
+| `refactor:` | code restructure only |
+
+Format: `prefix: scope — short description`
+Example: `sessions: S32 sealed — breath cue resolved, Act III scoped`
 
 3 small notes:
 
