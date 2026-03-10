@@ -32,7 +32,8 @@ A chronological narrative of each session. A witnessed record of how the system 
 28. Mar 09 — Handoff: Session 27 → 29
 29. Mar 10 — Act I locked, voltage routes silently, interactive demo shipped
 30. Mar 10 — Lo-modal killed, detail panel absorbs everything, Act II goes React
-31. Mar XX — [...]
+31. Mar 10 — Reader live on Redmi, security tightened, Claude Code wired to Pro
+32. Mar XX — [...]
 
 ---
 
