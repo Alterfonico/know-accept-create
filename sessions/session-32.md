@@ -33,3 +33,38 @@ The `design/mockups/` reader files (v010–v030) live alongside UI mockups but a
 ---
 
 _Opened: 2026-03-10 [HH:MM]Z — Closed: 2026-03-10 [HH:MM]Z_
+
+---
+
+## Handoff → Session 33
+
+**Where we are:**
+Repo is clean. Structure is semantic. No secrets exposed. Commit convention documented. S32 sealed.
+
+**Inherited open question (from S30):**
+Extend React (Acts I + III) or start production pipeline?
+
+**What to do first:**
+Use `/protocol-session-SKILL` to open S33. Then decide the S30 question — it has been parked for two sessions.
+
+If extending React:
+1. Wire Act I flow into the `meverse-act-ii_v0_21_0.jsx` component (splash → register → first capture → voltage → wave/wall → Home + detail panel auto-open)
+2. Act III side nav — insights with uptime heatmap + fractal map
+3. Pill capture sheet as global overlay
+
+If production pipeline:
+1. Supabase Edge Function — orchestration layer
+2. OpenRouter trinary inference wired in
+3. Mac-side capture pipeline
+
+**Parked (still open):**
+- GitHub Pages setup for live reader URL on Redmi — parked S31
+- `design/mockups/` reader files home — parked S32
+- HTTP Shortcuts `trinary_state` null model — parked S31
+
+**Files to know:**
+- `design/mockups/meverse-act-ii_v0_21_0.jsx` — Act II React component, canonical
+- `architecture/ux-architecture-ascii_v0130.md` — UX source of truth
+- `architecture/instructions-for-claude.md` — commit convention + session format
+- `open-issues.md` — single source, all zones + UX acts
+- `skills/protocol-session-SKILL_v030.md` — use this to open the session
