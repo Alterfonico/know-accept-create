@@ -32,7 +32,7 @@ The `design/mockups/` reader files (v010–v030) live alongside UI mockups but a
 
 ---
 
-_Opened: 2026-03-10 [HH:MM]Z — Closed: 2026-03-10 [HH:MM]Z_
+_Opened: 2026-03-10 16:34 local — Closed: 2026-03-10 20:16 local_
 
 ---
 
