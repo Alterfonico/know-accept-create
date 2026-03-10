@@ -1,489 +1,628 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"/>
-<title>meverse</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;1,300&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
-<style>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"
+    />
+    <title>meverse</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;1,300&family=Syne:wght@700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #07070d;
+        --bg2: #0d0d18;
+        --bg3: #111122;
+        --life: #7df9c2;
+        --upset: #ff6b6b;
+        --poke: #ffb347;
+        --purple: #a78bfa;
+        --text: #d0d0d8;
+        --dim: #484860;
+        --dim2: #2e2e45;
+        --border: rgba(255, 255, 255, 0.05);
+        --bubble: #12121e;
+        --mono: "IBM Plex Mono", monospace;
+        --disp: "Syne", sans-serif;
+        --safe-t: env(safe-area-inset-top, 0px);
+        --safe-b: env(safe-area-inset-bottom, 0px);
+      }
 
-:root {
-  --bg:      #07070D;
-  --bg2:     #0d0d18;
-  --bg3:     #111122;
-  --life:    #7DF9C2;
-  --upset:   #FF6B6B;
-  --poke:    #FFB347;
-  --purple:  #A78BFA;
-  --text:    #D0D0D8;
-  --dim:     #484860;
-  --dim2:    #2e2e45;
-  --border:  rgba(255,255,255,0.05);
-  --bubble:  #12121e;
-  --mono:    'IBM Plex Mono', monospace;
-  --disp:    'Syne', sans-serif;
-  --safe-t:  env(safe-area-inset-top, 0px);
-  --safe-b:  env(safe-area-inset-bottom, 0px);
-}
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      html,
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--mono);
+        height: 100dvh;
+        overflow: hidden;
+        -webkit-tap-highlight-color: transparent;
+      }
 
-html, body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--mono);
-  height: 100dvh;
-  overflow: hidden;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* ════════════════════════════════
+      /* ════════════════════════════════
    LAYOUT
 ════════════════════════════════ */
-.app {
-  display: flex;
-  flex-direction: column;
-  height: 100dvh;
-}
+      .app {
+        display: flex;
+        flex-direction: column;
+        height: 100dvh;
+      }
 
-/* ════════════════════════════════
+      /* ════════════════════════════════
    TOP NAV
 ════════════════════════════════ */
-.topnav {
-  flex-shrink: 0;
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
-  padding: calc(var(--safe-t) + 10px) 16px 10px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+      .topnav {
+        flex-shrink: 0;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        padding: calc(var(--safe-t) + 10px) 16px 10px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
 
-.nav-avatar {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  background: var(--bg3);
-  border: 1px solid rgba(125,249,194,0.15);
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.nav-avatar-inner {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  background: var(--life);
-  box-shadow: 0 0 8px var(--life);
-  animation: breathe 2.8s ease-in-out infinite;
-}
-@keyframes breathe {
-  0%,100% { opacity: 0.4; transform: scale(1); }
-  50%     { opacity: 1;   transform: scale(1.3); }
-}
+      .nav-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--bg3);
+        border: 1px solid rgba(125, 249, 194, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .nav-avatar-inner {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--life);
+        box-shadow: 0 0 8px var(--life);
+        animation: breathe 2.8s ease-in-out infinite;
+      }
+      @keyframes breathe {
+        0%,
+        100% {
+          opacity: 0.4;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.3);
+        }
+      }
 
-.nav-info { flex: 1; min-width: 0; }
-.nav-name {
-  font-family: var(--disp);
-  font-size: 15px;
-  font-weight: 800;
-  color: #fff;
-  letter-spacing: 3px;
-  line-height: 1.2;
-}
-.nav-sub {
-  font-size: 9px;
-  letter-spacing: 1.5px;
-  color: var(--dim);
-  margin-top: 1px;
-}
+      .nav-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .nav-name {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: 3px;
+        line-height: 1.2;
+      }
+      .nav-sub {
+        font-size: 9px;
+        letter-spacing: 1.5px;
+        color: var(--dim);
+        margin-top: 1px;
+      }
 
-.nav-actions {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-.nav-btn {
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--dim);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all .15s;
-}
-.nav-btn:active { background: var(--bg2); color: var(--text); }
+      .nav-actions {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .nav-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--dim);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .nav-btn:active {
+        background: var(--bg2);
+        color: var(--text);
+      }
 
-/* filter pill row hidden by default, toggled */
-.filter-wrap {
-  flex-shrink: 0;
-  overflow: hidden;
-  max-height: 0;
-  transition: max-height .3s cubic-bezier(.16,1,.3,1);
-  background: var(--bg);
-  border-bottom: 1px solid transparent;
-}
-.filter-wrap.open {
-  max-height: 50px;
-  border-bottom-color: var(--border);
-}
-.filter-bar {
-  display: flex; gap: 6px;
-  padding: 9px 16px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.filter-bar::-webkit-scrollbar { display: none; }
-.chip {
-  flex-shrink: 0;
-  padding: 4px 11px;
-  border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.07);
-  background: transparent;
-  color: var(--dim);
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 1.5px;
-  cursor: pointer;
-  transition: all .15s;
-}
-.chip.a-all  { border-color: rgba(255,255,255,0.2);  color: var(--text); }
-.chip.a-life { border-color: rgba(125,249,194,.4);   color: var(--life);   background: rgba(125,249,194,.05); }
-.chip.a-up   { border-color: rgba(255,107,107,.4);   color: var(--upset);  background: rgba(255,107,107,.05); }
-.chip.a-poke { border-color: rgba(255,179,71,.4);    color: var(--poke);   background: rgba(255,179,71,.05); }
-.chip.a-mob  { border-color: rgba(167,139,250,.4);   color: var(--purple); background: rgba(167,139,250,.05); }
+      /* filter pill row hidden by default, toggled */
+      .filter-wrap {
+        flex-shrink: 0;
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        background: var(--bg);
+        border-bottom: 1px solid transparent;
+      }
+      .filter-wrap.open {
+        max-height: 50px;
+        border-bottom-color: var(--border);
+      }
+      .filter-bar {
+        display: flex;
+        gap: 6px;
+        padding: 9px 16px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .filter-bar::-webkit-scrollbar {
+        display: none;
+      }
+      .chip {
+        flex-shrink: 0;
+        padding: 4px 11px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        background: transparent;
+        color: var(--dim);
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 1.5px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .chip.a-all {
+        border-color: rgba(255, 255, 255, 0.2);
+        color: var(--text);
+      }
+      .chip.a-life {
+        border-color: rgba(125, 249, 194, 0.4);
+        color: var(--life);
+        background: rgba(125, 249, 194, 0.05);
+      }
+      .chip.a-up {
+        border-color: rgba(255, 107, 107, 0.4);
+        color: var(--upset);
+        background: rgba(255, 107, 107, 0.05);
+      }
+      .chip.a-poke {
+        border-color: rgba(255, 179, 71, 0.4);
+        color: var(--poke);
+        background: rgba(255, 179, 71, 0.05);
+      }
+      .chip.a-mob {
+        border-color: rgba(167, 139, 250, 0.4);
+        color: var(--purple);
+        background: rgba(167, 139, 250, 0.05);
+      }
 
-/* ════════════════════════════════
+      /* ════════════════════════════════
    CHAT AREA
 ════════════════════════════════ */
-.chat {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 12px 14px 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-}
+      .chat {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 12px 14px 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+      }
 
-/* ── date separator ── */
-.date-sep {
-  align-self: center;
-  font-size: 9px;
-  letter-spacing: 1.8px;
-  color: var(--dim);
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 3px 10px;
-  margin: 10px 0 4px;
-  text-transform: lowercase;
-}
+      /* ── date separator ── */
+      .date-sep {
+        align-self: center;
+        font-size: 9px;
+        letter-spacing: 1.8px;
+        color: var(--dim);
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 3px 10px;
+        margin: 10px 0 4px;
+        text-transform: lowercase;
+      }
 
-/* ── message row ── */
-.msg {
-  display: flex;
-  justify-content: flex-end;
-  padding: 0 2px;
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity .3s ease, transform .3s ease;
-}
-.msg.visible    { opacity: 1; transform: none; }
-.msg.new-group  { margin-top: 8px; }
+      /* ── message row ── */
+      .msg {
+        display: flex;
+        justify-content: flex-end;
+        padding: 0 2px;
+        opacity: 0;
+        transform: translateY(8px);
+        transition:
+          opacity 0.3s ease,
+          transform 0.3s ease;
+      }
+      .msg.visible {
+        opacity: 1;
+        transform: none;
+      }
+      .msg.new-group {
+        margin-top: 8px;
+      }
 
-/* ── bubble ── */
-.bubble {
-  max-width: 78%;
-  background: var(--bubble);
-  border-radius: 16px 16px 3px 16px;
-  padding: 9px 12px 7px;
-  border: 1px solid rgba(255,255,255,0.04);
-  position: relative;
-  overflow: hidden;
-}
+      /* ── bubble ── */
+      .bubble {
+        max-width: 78%;
+        background: var(--bubble);
+        border-radius: 16px 16px 3px 16px;
+        padding: 9px 12px 7px;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        position: relative;
+        overflow: hidden;
+      }
 
-/* left-side state stripe */
-.bubble::after {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 2px;
-}
-.v-life  .bubble::after { background: var(--life);  box-shadow: 2px 0 8px rgba(125,249,194,.3); }
-.v-upset .bubble::after { background: var(--upset); box-shadow: 2px 0 8px rgba(255,107,107,.3); }
-.v-poke  .bubble::after { background: var(--poke);  box-shadow: 2px 0 6px rgba(255,179,71,.25); }
-.v-none  .bubble::after { background: var(--dim2); }
+      /* left-side state stripe */
+      .bubble::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+      }
+      .v-life .bubble::after {
+        background: var(--life);
+        box-shadow: 2px 0 8px rgba(125, 249, 194, 0.3);
+      }
+      .v-upset .bubble::after {
+        background: var(--upset);
+        box-shadow: 2px 0 8px rgba(255, 107, 107, 0.3);
+      }
+      .v-poke .bubble::after {
+        background: var(--poke);
+        box-shadow: 2px 0 6px rgba(255, 179, 71, 0.25);
+      }
+      .v-none .bubble::after {
+        background: transparent;
+      }
 
-.bubble-txt {
-  font-size: 14px;
-  line-height: 1.7;
-  color: var(--text);
-  padding-left: 6px;
-  word-break: break-word;
-}
+      .bubble-txt {
+        font-size: 14px;
+        line-height: 1.7;
+        color: var(--text);
+        padding-left: 6px;
+        word-break: break-word;
+      }
 
-.bubble-foot {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-top: 4px;
-  padding-left: 6px;
-}
-.b-time  { font-size: 9px; letter-spacing: 1px; color: var(--dim); }
-.b-state { font-size: 9px; letter-spacing: 0.5px; }
-.b-dev   { font-size: 8px; color: var(--dim); opacity: .45; margin-left: auto; }
-.st-life  { color: var(--life); }
-.st-upset { color: var(--upset); }
-.st-poke  { color: var(--poke); }
-.st-none  { color: var(--dim); }
+      .bubble-foot {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 4px;
+        padding-left: 6px;
+      }
+      .b-time {
+        font-size: 9px;
+        letter-spacing: 1px;
+        color: var(--dim);
+      }
+      .b-state {
+        font-size: 9px;
+        letter-spacing: 0.5px;
+      }
+      .b-dev {
+        font-size: 8px;
+        color: var(--dim);
+        opacity: 0.45;
+        margin-left: auto;
+      }
+      .st-life {
+        color: var(--life);
+      }
+      .st-upset {
+        color: var(--upset);
+      }
+      .st-poke {
+        color: var(--poke);
+      }
+      .st-none {
+        color: var(--dim);
+      }
 
-/* ── loading ── */
-#loading {
-  align-self: center;
-  margin: auto;
-  font-size: 10px;
-  letter-spacing: 2.5px;
-  color: var(--dim);
-  animation: flicker 1.6s ease-in-out infinite;
-}
-@keyframes flicker { 0%,100%{opacity:.3} 50%{opacity:1} }
+      /* ── loading ── */
+      #loading {
+        align-self: center;
+        margin: auto;
+        font-size: 10px;
+        letter-spacing: 2.5px;
+        color: var(--dim);
+        animation: flicker 1.6s ease-in-out infinite;
+      }
+      @keyframes flicker {
+        0%,
+        100% {
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
 
-#error {
-  display: none;
-  align-self: stretch;
-  margin: 16px;
-  padding: 14px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,107,107,.2);
-  background: rgba(255,107,107,.04);
-  font-size: 10px;
-  line-height: 1.9;
-  color: var(--upset);
-}
+      #error {
+        display: none;
+        align-self: stretch;
+        margin: 16px;
+        padding: 14px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 107, 107, 0.2);
+        background: rgba(255, 107, 107, 0.04);
+        font-size: 10px;
+        line-height: 1.9;
+        color: var(--upset);
+      }
 
-/* ════════════════════════════════
+      /* ════════════════════════════════
    INPUT BAR
 ════════════════════════════════ */
-.input-bar {
-  flex-shrink: 0;
-  background: var(--bg);
-  border-top: 1px solid var(--border);
-  padding: 10px 14px calc(var(--safe-b) + 10px);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+      .input-bar {
+        flex-shrink: 0;
+        background: var(--bg);
+        border-top: 1px solid var(--border);
+        padding: 10px 14px calc(var(--safe-b) + 10px);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
 
-.input-pill {
-  flex: 1;
-  background: var(--bg2);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 22px;
-  padding: 11px 16px;
-  font-family: var(--mono);
-  font-size: 13px;
-  color: var(--dim);
-  font-style: italic;
-  letter-spacing: 0.02em;
-  pointer-events: none;
-  user-select: none;
-}
+      .input-pill {
+        flex: 1;
+        background: var(--bg2);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 22px;
+        padding: 11px 16px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--dim);
+        font-style: italic;
+        letter-spacing: 0.02em;
+        pointer-events: none;
+        user-select: none;
+      }
 
-.send-btn {
-  width: 40px; height: 40px;
-  border-radius: 50%;
-  background: rgba(125,249,194,0.08);
-  border: 1px solid rgba(125,249,194,0.2);
-  color: var(--life);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: all .15s;
-}
-.send-btn:active { background: rgba(125,249,194,0.15); }
+      .send-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(125, 249, 194, 0.08);
+        border: 1px solid rgba(125, 249, 194, 0.2);
+        color: var(--life);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: all 0.15s;
+      }
+      .send-btn:active {
+        background: rgba(125, 249, 194, 0.15);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <!-- TOP NAV -->
+      <nav class="topnav">
+        <div class="nav-avatar">
+          <div class="nav-avatar-inner"></div>
+        </div>
+        <div class="nav-info">
+          <div class="nav-name">MEVERSE</div>
+          <div class="nav-sub" id="nav-sub">···</div>
+        </div>
+        <div class="nav-actions">
+          <button class="nav-btn" id="filter-toggle" title="filter">⊹</button>
+        </div>
+      </nav>
 
-</style>
-</head>
-<body>
-<div class="app">
+      <!-- FILTER BAR (collapsible) -->
+      <div class="filter-wrap" id="filter-wrap">
+        <div class="filter-bar">
+          <button class="chip a-all" data-f="all">all</button>
+          <button class="chip" data-f="life">● life</button>
+          <button class="chip" data-f="upset">● upset</button>
+          <button class="chip" data-f="poke">● poke</button>
+          <button class="chip" data-f="null">● raw</button>
+          <button class="chip" data-f="mobile">mobile</button>
+          <button class="chip" data-f="computer">computer</button>
+        </div>
+      </div>
 
-  <!-- TOP NAV -->
-  <nav class="topnav">
-    <div class="nav-avatar">
-      <div class="nav-avatar-inner"></div>
+      <!-- CHAT -->
+      <div class="chat" id="chat">
+        <div id="loading">reading you ···</div>
+        <div id="error"></div>
+      </div>
+
+      <!-- INPUT BAR -->
+      <div class="input-bar">
+        <div class="input-pill">use HTTP Shortcuts to capture ···</div>
+        <div class="send-btn">↑</div>
+      </div>
     </div>
-    <div class="nav-info">
-      <div class="nav-name">MEVERSE</div>
-      <div class="nav-sub" id="nav-sub">···</div>
-    </div>
-    <div class="nav-actions">
-      <button class="nav-btn" id="filter-toggle" title="filter">⊹</button>
-    </div>
-  </nav>
 
-  <!-- FILTER BAR (collapsible) -->
-  <div class="filter-wrap" id="filter-wrap">
-    <div class="filter-bar">
-      <button class="chip a-all" data-f="all">all</button>
-      <button class="chip" data-f="life">● life</button>
-      <button class="chip" data-f="upset">● upset</button>
-      <button class="chip" data-f="poke">● poke</button>
-      <button class="chip" data-f="null">● raw</button>
-      <button class="chip" data-f="mobile">mobile</button>
-      <button class="chip" data-f="computer">computer</button>
-    </div>
-  </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script>
+      const db = supabase.createClient(
+        "https://nlfryozynimffhwkhhls.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sZnJ5b3p5bmltZmZod2toaGxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTExMDAsImV4cCI6MjA4ODEyNzEwMH0.VWLopIlZi7ad6MNA84LEo7ztiWBylzJ6g5Y1jHav1zw",
+      );
 
-  <!-- CHAT -->
-  <div class="chat" id="chat">
-    <div id="loading">reading you ···</div>
-    <div id="error"></div>
-  </div>
+      let all = [],
+        activeF = "all";
 
-  <!-- INPUT BAR -->
-  <div class="input-bar">
-    <div class="input-pill">use HTTP Shortcuts to capture ···</div>
-    <div class="send-btn">↑</div>
-  </div>
+      /* ── helpers ── */
+      function vc(s) {
+        if (!Number.isInteger(s)) return "none";
+        return s === 1 ? "life" : s === 2 ? "upset" : s === 0 ? "poke" : "none";
+      }
+      function vl(s) {
+        if (!Number.isInteger(s)) return "";
+        return s === 1 ? "LIFE" : s === 2 ? "UPSET" : s === 0 ? "POKE" : "";
+      }
 
-</div>
+      function timeBubble(iso) {
+        if (!iso) return "";
+        return new Date(iso).toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+      function dateLabel(iso) {
+        if (!iso) return "";
+        const d = new Date(iso);
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        const yest = new Date(now);
+        yest.setDate(now.getDate() - 1);
+        const day = new Date(d);
+        day.setHours(0, 0, 0, 0);
+        if (+day === +now) return "today";
+        if (+day === +yest) return "yesterday";
+        return d.toLocaleDateString("en-GB", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+        });
+      }
+      function esc(s) {
+        return String(s || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script>
-const db = supabase.createClient(
-  'https://nlfryozynimffhwkhhls.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sZnJ5b3p5bmltZmZod2toaGxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTExMDAsImV4cCI6MjA4ODEyNzEwMH0.VWLopIlZi7ad6MNA84LEo7ztiWBylzJ6g5Y1jHav1zw'
-);
+      /* ── render ── */
+      function render(thoughts) {
+        const chat = document.getElementById("chat");
+        chat.querySelectorAll(".msg,.date-sep").forEach((el) => el.remove());
 
-let all = [], activeF = 'all';
+        const count = thoughts.length;
+        document.getElementById("nav-sub").textContent =
+          count + " echo" + (count !== 1 ? "s" : "") + " · open brain";
 
-/* ── helpers ── */
-function vc(s)  { return s===2?'life':s===0?'upset':s===1?'poke':'none'; }
-function vl(s)  { return s===2?'LIFE':s===0?'UPSET':s===1?'POKE':''; }
+        if (!count) return;
 
-function timeBubble(iso) {
-  if (!iso) return '';
-  return new Date(iso).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-}
-function dateLabel(iso) {
-  if (!iso) return '';
-  const d    = new Date(iso);
-  const now  = new Date(); now.setHours(0,0,0,0);
-  const yest = new Date(now); yest.setDate(now.getDate()-1);
-  const day  = new Date(d);  day.setHours(0,0,0,0);
-  if (+day===+now)  return 'today';
-  if (+day===+yest) return 'yesterday';
-  return d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
-}
-function esc(s) {
-  return String(s||'')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+        const ordered = [...thoughts].reverse(); // oldest first
+        let lastDL = null,
+          lastMin = null;
 
-/* ── render ── */
-function render(thoughts) {
-  const chat = document.getElementById('chat');
-  chat.querySelectorAll('.msg,.date-sep').forEach(el=>el.remove());
+        ordered.forEach((t, i) => {
+          const dl = dateLabel(t.created_at);
+          if (dl !== lastDL) {
+            const sep = document.createElement("div");
+            sep.className = "date-sep";
+            sep.textContent = dl;
+            chat.appendChild(sep);
+            lastDL = dl;
+            lastMin = null;
+          }
 
-  const count = thoughts.length;
-  document.getElementById('nav-sub').textContent =
-    count + ' echo' + (count!==1?'s':'') + ' · open brain';
+          const v = vc(t.trinary_state);
+          const vLabel = vl(t.trinary_state);
+          const tBub = timeBubble(t.created_at);
+          const thisM = t.created_at
+            ? Math.floor(new Date(t.created_at) / 60000)
+            : 0;
+          const isNew = lastMin === null || thisM - lastMin > 5;
+          lastMin = thisM;
 
-  if (!count) return;
-
-  const ordered = [...thoughts].reverse(); // oldest first
-  let lastDL=null, lastMin=null;
-
-  ordered.forEach((t,i) => {
-    const dl = dateLabel(t.created_at);
-    if (dl !== lastDL) {
-      const sep = document.createElement('div');
-      sep.className = 'date-sep';
-      sep.textContent = dl;
-      chat.appendChild(sep);
-      lastDL = dl; lastMin = null;
-    }
-
-    const v      = vc(t.trinary_state);
-    const vLabel = vl(t.trinary_state);
-    const tBub   = timeBubble(t.created_at);
-    const thisM  = t.created_at ? Math.floor(new Date(t.created_at)/60000) : 0;
-    const isNew  = lastMin===null || (thisM-lastMin)>5;
-    lastMin = thisM;
-
-    const msg = document.createElement('div');
-    msg.className = 'msg v-'+v+(isNew?' new-group':'');
-    msg.innerHTML = `
+          const msg = document.createElement("div");
+          msg.className = "msg v-" + v + (isNew ? " new-group" : "");
+          msg.innerHTML = `
       <div class="bubble">
         <div class="bubble-txt">${esc(t.content)}</div>
         <div class="bubble-foot">
           <span class="b-time">${tBub}</span>
-          ${vLabel?`<span class="b-state st-${v}">${vLabel}</span>`:''}
-          ${t.device?`<span class="b-dev">${esc(t.device)}</span>`:''}
+          ${vLabel ? `<span class="b-state st-${v}">${vLabel}</span>` : ""}
+          ${t.device ? `<span class="b-dev">${esc(t.device)}</span>` : ""}
         </div>
       </div>`;
-    chat.appendChild(msg);
-    setTimeout(()=>msg.classList.add('visible'), 10 + i*15);
-  });
+          chat.appendChild(msg);
+          setTimeout(() => msg.classList.add("visible"), 10 + i * 15);
+        });
 
-  requestAnimationFrame(()=>{ chat.scrollTop = chat.scrollHeight; });
-}
+        requestAnimationFrame(() => {
+          chat.scrollTop = chat.scrollHeight;
+        });
+      }
 
-/* ── filter ── */
-function applyFilter(f) {
-  let r = all;
-  if      (f==='life')     r = all.filter(t=>t.trinary_state===2);
-  else if (f==='upset')    r = all.filter(t=>t.trinary_state===0);
-  else if (f==='poke')     r = all.filter(t=>t.trinary_state===1);
-  else if (f==='null')     r = all.filter(t=>t.trinary_state===null);
-  else if (f==='mobile')   r = all.filter(t=>t.device==='mobile');
-  else if (f==='computer') r = all.filter(t=>t.device==='computer');
-  render(r);
-}
+      /* ── filter ── */
+      function applyFilter(f) {
+        let r = all;
+        if (f === "life") r = all.filter((t) => t.trinary_state === 2);
+        else if (f === "upset") r = all.filter((t) => t.trinary_state === 0);
+        else if (f === "poke") r = all.filter((t) => t.trinary_state === 1);
+        else if (f === "null") r = all.filter((t) => t.trinary_state === null);
+        else if (f === "mobile") r = all.filter((t) => t.device === "mobile");
+        else if (f === "computer")
+          r = all.filter((t) => t.device === "computer");
+        render(r);
+      }
 
-const acMap = {
-  all:'a-all',life:'a-life',upset:'a-up',
-  poke:'a-poke',null:'a-up',mobile:'a-mob',computer:'a-mob'
-};
-document.querySelectorAll('.chip').forEach(c=>{
-  c.addEventListener('click',()=>{
-    document.querySelectorAll('.chip').forEach(x=>x.className='chip');
-    const f=c.dataset.f;
-    c.classList.add(acMap[f]||'a-all');
-    activeF=f;
-    applyFilter(f);
-  });
-});
+      const acMap = {
+        all: "a-all",
+        life: "a-life",
+        upset: "a-up",
+        poke: "a-poke",
+        null: "a-up",
+        mobile: "a-mob",
+        computer: "a-mob",
+      };
+      document.querySelectorAll(".chip").forEach((c) => {
+        c.addEventListener("click", () => {
+          document
+            .querySelectorAll(".chip")
+            .forEach((x) => (x.className = "chip"));
+          const f = c.dataset.f;
+          c.classList.add(acMap[f] || "a-all");
+          activeF = f;
+          applyFilter(f);
+        });
+      });
 
-/* ── filter toggle ── */
-document.getElementById('filter-toggle').addEventListener('click',()=>{
-  document.getElementById('filter-wrap').classList.toggle('open');
-});
+      /* ── filter toggle ── */
+      document.getElementById("filter-toggle").addEventListener("click", () => {
+        document.getElementById("filter-wrap").classList.toggle("open");
+      });
 
-/* ── load ── */
-async function load() {
-  const {data,error} = await db
-    .from('thoughts')
-    .select('id,content,created_at,trinary_state,state_source,device,input_type')
-    .order('created_at',{ascending:false})
-    .limit(150);
+      /* ── load ── */
+      async function load() {
+        const { data, error } = await db
+          .from("thoughts")
+          .select(
+            "id,content,created_at,trinary_state,state_source,device,input_type",
+          )
+          .order("created_at", { ascending: false })
+          .limit(150);
 
-  document.getElementById('loading').style.display='none';
+        document.getElementById("loading").style.display = "none";
 
-  if (error) {
-    const el=document.getElementById('error');
-    el.style.display='block';
-    el.innerHTML=`<strong>read failed</strong><br><br>${esc(error.message)}`;
-    return;
-  }
-  all = data||[];
-  applyFilter(activeF);
-}
+        if (error) {
+          const el = document.getElementById("error");
+          el.style.display = "block";
+          el.innerHTML = `<strong>read failed</strong><br><br>${esc(error.message)}`;
+          return;
+        }
+        all = data || [];
+        applyFilter(activeF);
+      }
 
-load();
-</script>
-</body>
+      load();
+    </script>
+  </body>
 </html>
