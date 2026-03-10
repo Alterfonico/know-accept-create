@@ -31,7 +31,7 @@ A chronological narrative of each session. A witnessed record of how the system 
 27. Mar 09 — Mockup sprint v0.7.0→v0.14.0, JS layer introduced, light mode shipped
 28. Mar 09 — Handoff: Session 27 → 29
 29. Mar 10 — Act I locked, voltage routes silently, interactive demo shipped
-30. Mar XX — [...]
+30. Mar 10 — Lo-modal killed, detail panel absorbs everything, Act II goes React
 31. Mar XX — [...]
 
 ---
