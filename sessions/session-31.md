@@ -1,4 +1,5 @@
 # Session 31 — 2026-03-10
+
 ## Reader live, security tightened, Claude Code wired to Pro
 
 **State on arrival:** Energized from S30 — UX locked, one open question: extend React or start production pipeline.
@@ -19,6 +20,7 @@ Claude Code wired to Pro after a login loop (Console API key was overriding subs
 Session closed with the reader live on the Redmi, echoes flowing, "regresando a la paz..." as the last bubble.
 
 **Produced:**
+
 - `assets/meverse/mockups/meverse-reader_v010.html` — echo list, Meverse identity
 - `assets/meverse/mockups/meverse-reader_v020.html` — chat layout, bubbles from bottom
 - `assets/meverse/mockups/meverse-reader_v030.html` — full chat UI, filter toggle, strict trinary stripe, correct 0/1/2 mapping
@@ -33,8 +35,12 @@ Session closed with the reader live on the Redmi, echoes flowing, "regresando a 
 - PARKED: GitHub Pages setup for live URL on Redmi
 - PARKED: repo security audit from Claude Code terminal
 - PARKED: Claude Code login merry-go-round — root cause documented
+- DB trigger `trg_extract_state` — prefix `0 ` / `1 ` / `2 ` + space sets trinary_state, strips prefix from content. No second prompt. One input.
+- DB trigger `trg_set_state_source` — auto-sets `state_source: declared` when trinary_state is not null on insert
+- `meverse-reader_v030.html` corrected in repo — wrong trinary mapping had shipped, fixed and pushed
+- Reader live on GitHub Pages: `alterfonico.github.io/know-accept-create/...`
 
 **Open question:**
-HTTP Shortcuts currently hardcodes `trinary_state: 0` — what's the cleanest way to make state optional in the shortcut without adding friction to the capture flow?
+The reader is capped at 150 echoes and doesn't auto-refresh — does it need realtime or is manual reload the right friction for now?
 
 _Opened: 2026-03-10 15:57Z — Closed: 2026-03-10 18:30Z_
