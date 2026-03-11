@@ -77,7 +77,7 @@ Known open issues. Not blockers. Logged so they cannot hide.
 
 - [x] `capture-echo` Edge Function built — POST text → classifier → embedding → store → return voltage (S34)
 - [x] `capture-echo` deployed to Supabase — live, tested end-to-end (S35)
-- [ ] React component `mockClassify()` replaced with real `capture-echo` call
+- [ ] React component `mockClassify()` replaced with real `capture-echo` call — PARKED S36
 - [ ] Android HTTP Shortcuts reconfigured to call `capture-echo` instead of Supabase REST direct
 - [ ] Mac-side capture pipeline — no implementation
 - [ ] GitHub Pages (or equivalent) for live reader URL on Redmi
