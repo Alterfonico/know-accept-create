@@ -170,6 +170,20 @@ Layer 6 — Human        (You)
   Installed as `/kw-meta` command.
 - **The user** is the final witness. The loop closes at the human.
 
+### Running agents
+
+KW and WP are active as local scheduled tasks (Claude Code scheduled-tasks MCP).
+They are not in this repo — they live on the machine that runs Claude Code.
+
+| Agent | Cadence | Reads | Writes |
+|---|---|---|---|
+| KW (`kernel-witness`) | Every 4h | `thoughts` table (last 20 rows) | `open-issues.md` § KW Observations |
+| WP (`witness-prime`) | Every 12h | `open-issues.md` § KW Observations | `kw-meta-audit.md` |
+
+If these tasks are missing (new machine, reinstall): recreate via `create_scheduled_task`
+using the prompts in `skills/062-kw-meta-SKILL.md` as the WP source and the procedure
+documented in sessions/session-37.md for KW.
+
 ## Tech stack
 
 - **Database:** Supabase (PostgreSQL + pgvector)

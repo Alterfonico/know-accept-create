@@ -110,3 +110,25 @@ Issues are resolved in stage order.
 No issue gets fixed out of sequence unless it's a security risk.
 Bot token is a security risk — priority one.
 Everything else follows the roadmap.
+
+---
+
+## KW Observations
+
+<!--
+  OWNERSHIP BOUNDARY
+  Everything ABOVE this section is human-maintained.
+  Everything BELOW (including this section) is KW-owned.
+  KW appends here. Humans read but do not edit below this line.
+  WP parses from this marker downward.
+-->
+
+### [2026-03-11 19:02Z] Friction: 6/10
+- **Type:** EMBEDDING_FAILURE
+- **Evidence:** 17 of 20 most recent rows have no embedding. Only 3 rows (16:14Z–16:20Z) have embeddings — these also have null device and null input_type, suggesting they came through capture-echo. The remaining 17 rows have device=mobile, state_source=declared, indicating HTTP Shortcuts path which bypasses embedding generation. Pattern is consistent, not random.
+- **Rows affected:** 17/20 in window 14:31Z–17:45Z (all 2026-03-11)
+
+### [2026-03-11 19:02Z] Friction: 4/10
+- **Type:** CLASSIFIER_FAILURE
+- **Evidence:** 6 of 20 rows have trinary_state=null and state_source=null. 3 of these also have null device/input_type (16:14Z–16:20Z range, likely capture-echo path where classifier may have failed or returned below confidence threshold). The other 3 (14:32Z, 17:13Z, 17:19Z) have device=mobile, input_type=text but null voltage — these arrived via HTTP Shortcuts without a declared state.
+- **Rows affected:** 6/20 in window 14:31Z–17:45Z (all 2026-03-11)
