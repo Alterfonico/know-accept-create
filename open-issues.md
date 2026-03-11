@@ -1,6 +1,6 @@
 # open-issues.md
 
-**Last updated:** 2026-03-09
+**Last updated:** 2026-03-11
 
 Known open issues. Not blockers. Logged so they cannot hide.
 
@@ -28,7 +28,9 @@ Known open issues. Not blockers. Logged so they cannot hide.
 
 ## Other
 
-- [ ] assets/ folder bloated — 116% of repo size, consider GitHub LFS or external storage
+- [x] assets/ folder bloated — restructured S32: assets/ → design/, screens consolidated, prototypes separated
+- [ ] `setup-worktree.sh` sitting untracked in repo root — commit or delete
+- [ ] `skills/` folder has 16 lineage files but only `062-kw-meta-SKILL.md` is active — archive or keep flat?
 
 ---
 
@@ -42,8 +44,8 @@ Known open issues. Not blockers. Logged so they cannot hide.
       both currently route to #capture. Fine for mockup; needs branching before dev
 - [ ] `wall-to-lopath` JS handler is orphaned — references a button removed
       in v0.9.0. Harmless but should be cleaned before dev handoff
-- [ ] Act II post-save destination unresolved — breath cue removed in v0.9.0,
-      no replacement defined. Loop currently closes silently after send
+- [x] Act II post-save destination — resolved S23/S27: placeholder flash "breathe, captured." 2s
+- [ ] Act II post-save confirmation copy "got it, be back when you're ready" not in mockup as of v0.16.0
 - [ ] Local Fractal threshold (exact entry count) not yet defined
 - [ ] "inquiry about node" as future feature
 
@@ -70,6 +72,22 @@ Known open issues. Not blockers. Logged so they cannot hide.
 - [ ] Fractal Map View — internal structure undefined
 
 ---
+
+## Production Pipeline (Stage 7)
+
+- [ ] Supabase Edge Function — orchestration layer not yet built
+- [ ] OpenRouter trinary inference — not wired into pipeline
+- [ ] Mac-side capture pipeline — no implementation
+- [ ] GitHub Pages (or equivalent) for live reader URL on Redmi
+- [ ] HTTP Shortcuts `trinary_state` null model — classifier not handling nulls
+- [ ] Batch embedding pass — generate vectors for all null embeddings
+
+## Repo Hygiene
+
+- [ ] `design/mockups/` has 27 HTML files (v0.1 through v0.21) — only latest matters for dev; archive old versions?
+- [ ] `design/mockups/` reader files live alongside UI mockups but are functionally different — need own home?
+- [ ] `instructions-for-claude.md` last updated Mar 6, missing session protocol v030 reference and kw-meta skill
+- [ ] No CLAUDE.md in repo root — project conventions live across 3 files (instructions, protocol skill, ADRs)
 
 ## Protocol
 
