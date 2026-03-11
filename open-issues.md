@@ -75,19 +75,34 @@ Known open issues. Not blockers. Logged so they cannot hide.
 
 ## Production Pipeline (Stage 7)
 
-- [ ] Supabase Edge Function — orchestration layer not yet built
-- [ ] OpenRouter trinary inference — not wired into pipeline
+- [x] `capture-echo` Edge Function built — POST text → classifier → embedding → store → return voltage (S34)
+- [ ] `capture-echo` deployed to Supabase — built but not yet deployed
+- [ ] React component `mockClassify()` replaced with real `capture-echo` call
+- [ ] Android HTTP Shortcuts reconfigured to call `capture-echo` instead of Supabase REST direct
 - [ ] Mac-side capture pipeline — no implementation
 - [ ] GitHub Pages (or equivalent) for live reader URL on Redmi
-- [ ] HTTP Shortcuts `trinary_state` null model — classifier not handling nulls
 - [ ] Batch embedding pass — generate vectors for all null embeddings
+
+**Two capture modes — do not confuse:**
+- HTTP Shortcuts (Zone A, live): user manually declares 0/1/2 → Supabase REST direct. Colors work. No classifier. Documented S20.
+- Meverse app (Stage 5+, in progress): user types text → `capture-echo` infers voltage via AI → wave/wall UX.
+  `capture-echo` is for the app path only. HTTP Shortcuts stays as-is.
+
+- [ ] HTTP Shortcuts `trinary_state` null model — declared state arriving as null not handled gracefully.
+      Shortcut config fix, not a pipeline fix. Investigate HTTP Shortcuts variable binding.
 
 ## Repo Hygiene
 
 - [ ] `design/mockups/` has 27 HTML files (v0.1 through v0.21) — only latest matters for dev; archive old versions?
 - [ ] `design/mockups/` reader files live alongside UI mockups but are functionally different — need own home?
-- [ ] `instructions-for-claude.md` last updated Mar 6, missing session protocol v030 reference and kw-meta skill
-- [ ] No CLAUDE.md in repo root — project conventions live across 3 files (instructions, protocol skill, ADRs)
+- [x] `instructions-for-claude.md` — marked superseded by CLAUDE.md (S34)
+- [x] CLAUDE.md created at repo root — unified project instructions (S34)
+
+## Protocol
+
+PARKED: audit complexity at least once a week — spec and code both.
+When a fix adds a mechanism, ask: does this belong here or does it belong at a simpler layer?
+The kw-meta arc (v0.3 → v0.5.3 → v0.6.2) is the reference. Complexity compounds invisibly.
 
 ## Protocol
 
