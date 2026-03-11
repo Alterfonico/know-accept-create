@@ -22,8 +22,22 @@ const VOLTAGE = [
   { key: "poke",  label: "FLAT · 0 · POKE", color: T.poke  },
 ];
 
-function mockClassify() {
-  return VOLTAGE[Math.floor(Math.random() * VOLTAGE.length)];
+const VOLTAGE_MAP = { HI: VOLTAGE[0], LO: VOLTAGE[1], FLAT: VOLTAGE[2] };
+
+const CAPTURE_ECHO_URL = "https://nlfryozynimffhwkhhls.supabase.co/functions/v1/capture-echo";
+const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sZnJ5b3p5bmltZmZod2toaGxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTExMDAsImV4cCI6MjA4ODEyNzEwMH0.VWLopIlZi7ad6MNA84LEo7ztiWBylzJ6g5Y1jHav1zw";
+
+async function classifyEcho(text) {
+  const res = await fetch(CAPTURE_ECHO_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${ANON_KEY}`,
+    },
+    body: JSON.stringify({ text, source: "app" }),
+  });
+  if (!res.ok) throw new Error(`capture-echo ${res.status}`);
+  return res.json(); // { id, voltage, confidence, analysis }
 }
 
 function timeNow() {
@@ -329,16 +343,17 @@ export default function MeverseActII() {
 
   useEffect(scrollBottom, [echoes.length, scrollBottom]);
 
-  function handleSend() {
+  async function handleSend() {
     const text = draft.trim();
     if (!text) return;
     counter.current++;
     const id = "e" + counter.current;
-    const v = mockClassify();
-    const words = text.split(/\s+/).filter(Boolean).length;
+
+    // Optimistic echo — appears immediately, voltage pending
     const newEcho = {
-      id, text, ts: timeNow(), voltage: v,
-      confidence: +(0.6 + Math.random() * 0.35).toFixed(2),
+      id, text, ts: timeNow(),
+      voltage: VOLTAGE[2], // FLAT placeholder until classifier returns
+      confidence: null,
       analysis: "classifying...",
       isOrigin: false, children: [],
     };
@@ -355,6 +370,26 @@ export default function MeverseActII() {
       setTimeout(() => {
         if (inputRef.current) inputRef.current.placeholder = "what's here right now...";
       }, 2000);
+    }
+
+    // Classify — update echo in place when result arrives
+    try {
+      const result = await classifyEcho(text);
+      setEchoes(prev => prev.map(e =>
+        e.id === id
+          ? {
+              ...e,
+              voltage: VOLTAGE_MAP[result.voltage] ?? VOLTAGE[2],
+              confidence: result.confidence,
+              analysis: result.analysis,
+            }
+          : e
+      ));
+    } catch (_err) {
+      // Failure contract: echo is never lost — stays with FLAT voltage, no analysis
+      setEchoes(prev => prev.map(e =>
+        e.id === id ? { ...e, analysis: "signal received." } : e
+      ));
     }
   }
 
@@ -499,7 +534,7 @@ export default function MeverseActII() {
           padding: 4, textAlign: "center", fontSize: 7,
           letterSpacing: 1.5, color: "rgba(0,0,0,0.15)",
           zIndex: 0, pointerEvents: "none",
-        }}>v0.21.0 · act ii · react</div>
+        }}>v0.22.0 · act ii · capture-echo wired</div>
       </div>
     </div>
   );
