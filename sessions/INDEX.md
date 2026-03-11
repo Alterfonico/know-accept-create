@@ -36,6 +36,7 @@ A chronological narrative of each session. A witnessed record of how the system 
 32. Mar 10 — Repo audit: folder hierarchy cleaned, secrets sealed, commit convention set
 33. Mar 11 — Skills folder analyzed, kw-meta v0.6.2 installed as Claude Code command
 34. Mar 11 — CLAUDE.md created, roadmap updated to Stage 7
+35. Mar 11 — Production pipeline live — capture-echo deployed, embeddings backfilled
 
 ---
 
