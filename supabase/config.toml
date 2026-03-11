@@ -10,6 +10,12 @@ entrypoint = "./functions/ingest-thought/index.ts"
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/ingest-thought/*.html" ]
 
+[functions.capture-echo]
+enabled = true
+verify_jwt = true
+import_map = "./functions/capture-echo/deno.json"
+entrypoint = "./functions/capture-echo/index.ts"
+
 [functions.open-brain-mcp]
 enabled = true
 verify_jwt = true
