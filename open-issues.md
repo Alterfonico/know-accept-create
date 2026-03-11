@@ -23,7 +23,7 @@ Known open issues. Not blockers. Logged so they cannot hide.
 - [ ] `status` and `friction` columns empty and unspecified —
       decide: keep as human-maintained fields or remove
 - [x] Retroactive Golden Spreadsheet import to Supabase — 39 rows inserted 2026-03-07
-- [ ] Batch embedding pass — generate vectors for all null embeddings (Stage 6)
+- [x] Batch embedding pass — 249/251 rows embedded (S35). 2 empty-content rows skipped.
 - [ ] Figma file showing real data
 
 ## Other
@@ -81,7 +81,7 @@ Known open issues. Not blockers. Logged so they cannot hide.
 - [ ] Android HTTP Shortcuts reconfigured to call `capture-echo` instead of Supabase REST direct
 - [ ] Mac-side capture pipeline — no implementation
 - [ ] GitHub Pages (or equivalent) for live reader URL on Redmi
-- [ ] Batch embedding pass — generate vectors for all null embeddings
+- [x] Batch embedding pass — 249/251 rows embedded (S35)
 
 **Two capture modes — do not confuse:**
 - HTTP Shortcuts (Zone A, live): user manually declares 0/1/2 → Supabase REST direct. Colors work. No classifier. Documented S20.
