@@ -29,7 +29,7 @@ Known open issues. Not blockers. Logged so they cannot hide.
 ## Other
 
 - [x] assets/ folder bloated — restructured S32: assets/ → design/, screens consolidated, prototypes separated
-- [ ] `setup-worktree.sh` sitting untracked in repo root — commit or delete
+- [x] `setup-worktree.sh` — moved to local backup, no longer in repo
 - [ ] `skills/` folder has 16 lineage files but only `062-kw-meta-SKILL.md` is active — archive or keep flat?
 
 ---
