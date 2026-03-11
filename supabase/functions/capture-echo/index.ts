@@ -34,6 +34,27 @@ const CONFIDENCE_THRESHOLD = 0.60; // below this → voltage stored as null
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+// ── Trinary voltage → integer mapping ─────────────────────────────────────────
+//
+// Schema column `trinary_state` stores integers per ADR-002:
+//   FLAT → 0 (POKE)
+//   HI   → 1 (LIFE)
+//   LO   → 2 (UPSET)
+
+const VOLTAGE_TO_INT: Record<string, number> = { FLAT: 0, HI: 1, LO: 2 };
+
+// ── Source → device inference ──────────────────────────────────────────────────
+//
+// `source` is caller-supplied (e.g. "android", "mac", "app").
+// Map to the `device` CHECK constraint: 'computer' | 'mobile' | 'other'
+
+function inferDevice(source: string): "computer" | "mobile" | "other" {
+  const s = source.toLowerCase();
+  if (s.includes("android") || s.includes("mobile") || s.includes("redmi")) return "mobile";
+  if (s.includes("mac") || s.includes("computer") || s.includes("desktop")) return "computer";
+  return "other";
+}
+
 // ── Trinary voltage classifier ────────────────────────────────────────────────
 //
 // Returns one of three states defined in ADR-002 (Layer 2 / UX altitude):
@@ -194,18 +215,24 @@ Deno.serve(async (req: Request): Promise<Response> => {
   const confidence = classification?.confidence ?? null;
   const analysis   = (voltage !== null) ? (classification?.analysis ?? null) : null;
 
+  // Map voltage string to schema integer (null stays null — valid state per ADR-004)
+  const trinaryState = voltage !== null ? VOLTAGE_TO_INT[voltage] : null;
+
   // Always store the echo — classifier failure never loses an entry (ADR-004)
   const { data, error } = await supabase
     .from("thoughts")
     .insert({
-      content:   text,
-      embedding: embedding,   // null if embedding failed — backfillable
+      content:        text,
+      embedding:      embedding,      // null if embedding failed — backfillable
+      trinary_state:  trinaryState,   // 0/1/2 | null
+      state_source:   voltage !== null ? "inferred" : null,
+      input_type:     "text",
+      device:         inferDevice(source),
       metadata: {
         source,
-        word_count: wordCount,
-        voltage,              // "HI" | "LO" | "FLAT" | null
-        confidence,           // float | null
-        analysis,             // string | null
+        word_count:  wordCount,
+        confidence,                   // float | null — not a schema column
+        analysis,                     // string | null — not a schema column
       },
     })
     .select("id")
