@@ -41,6 +41,7 @@ A chronological narrative of each session. A witnessed record of how the system 
 37. Mar 11 — Agents live — KW + WP scheduled, capture-echo wired, meverse-react v030 rebuilt from v050
 38. Mar 12 — Warp trial — same codebase, different witness; CLAUDE.md audit (7 items PARKED); v030 verified build-clean
 39. Mar 12 — Recovery — branch mess repaired, process hardened, branch deletion invariant installed, audit cadence defined
+40. Mar 12 — Reader v070 — 3-canvas desktop architecture, right panel live, 150 echoes with metadata
 
 ---
 
