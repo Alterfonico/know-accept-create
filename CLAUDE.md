@@ -126,13 +126,18 @@ Example: `sessions: S34 sealed — CLAUDE.md created, roadmap updated`
 
 ### Trinary state
 
-One integer, three altitudes of meaning:
+One integer, three altitudes of meaning (recalibrated S40):
 
 ```
 Layer 0 — Metaphysical   0 = infinite potential  1 = polarity A   2 = polarity B
-Layer 1 — Biological     0 = POKE                1 = LIFE         2 = UPSET
+Layer 1 — Semantic       0 = TASK                1 = IMPORTANT    2 = IMPORTANT
 Layer 2 — UX/Mobile      0 = FLAT                1 = HI           2 = LO
 ```
+
+**Semantics:**
+- **TASK (0)** — routine, actionable, neutral. User can mark via "0 " prefix.
+- **IMPORTANT (1 & 2)** — IMPORTANT·positive (HI/LIFE, green) or IMPORTANT·negative (LO/UPSET, red).
+- **Precedence:** If AI classifier reads as IMPORTANT (HI/LO), it overrides user's TASK marking.
 
 The database stores the integer. The layer determines how it is read.
 Voltage is inferred by AI classifier, never selected explicitly.

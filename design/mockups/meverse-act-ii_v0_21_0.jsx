@@ -17,12 +17,12 @@ const T = {
 };
 
 const VOLTAGE = [
-  { key: "life",  label: "HI · 1 · LIFE",  color: T.life  },
-  { key: "upset", label: "LO · 2 · UPSET",  color: T.upset },
-  { key: "poke",  label: "FLAT · 0 · POKE", color: T.poke  },
+  { key: "life",  label: "HI · 1 · IMPORTANT",  color: T.life  },
+  { key: "upset", label: "LO · 2 · IMPORTANT",  color: T.upset },
+  { key: "task",  label: "FLAT · 0 · TASK", color: T.poke  },
 ];
 
-const VOLTAGE_MAP = { HI: VOLTAGE[0], LO: VOLTAGE[1], FLAT: VOLTAGE[2] };
+const VOLTAGE_MAP = { HI: VOLTAGE[0], LO: VOLTAGE[1], FLAT: VOLTAGE[2] }; // HI/LO = IMPORTANT; FLAT = TASK
 
 const CAPTURE_ECHO_URL = "https://nlfryozynimffhwkhhls.supabase.co/functions/v1/capture-echo";
 const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sZnJ5b3p5bmltZmZod2toaGxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTExMDAsImV4cCI6MjA4ODEyNzEwMH0.VWLopIlZi7ad6MNA84LEo7ztiWBylzJ6g5Y1jHav1zw";

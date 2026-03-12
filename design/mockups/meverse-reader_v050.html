@@ -195,7 +195,7 @@
         color: var(--upset);
         background: rgba(255, 107, 107, 0.05);
       }
-      .chip.a-poke {
+      .chip.a-task {
         border-color: rgba(255, 179, 71, 0.4);
         color: var(--poke);
         background: rgba(255, 179, 71, 0.05);
@@ -282,7 +282,7 @@
         background: var(--upset);
         box-shadow: 2px 0 8px rgba(255, 107, 107, 0.3);
       }
-      .v-poke .bubble::after {
+      .v-task .bubble::after {
         background: var(--poke);
         box-shadow: 2px 0 6px rgba(255, 179, 71, 0.25);
       }
@@ -326,7 +326,7 @@
       .st-upset {
         color: var(--upset);
       }
-      .st-poke {
+      .st-task {
         color: var(--poke);
       }
       .st-none {
@@ -489,9 +489,9 @@
       <div class="filter-wrap" id="filter-wrap">
         <div class="filter-bar">
           <button class="chip a-all" data-f="all">all</button>
-          <button class="chip" data-f="life">● life</button>
-          <button class="chip" data-f="upset">● upset</button>
-          <button class="chip" data-f="poke">● poke</button>
+          <button class="chip" data-f="life">● important+</button>
+          <button class="chip" data-f="upset">● important−</button>
+          <button class="chip" data-f="task">● task</button>
           <button class="chip" data-f="null">● raw</button>
           <button class="chip" data-f="mobile">mobile</button>
           <button class="chip" data-f="computer">computer</button>
@@ -524,11 +524,11 @@
       /* ── helpers ── */
       function vc(s) {
         if (!Number.isInteger(s)) return "none";
-        return s === 1 ? "life" : s === 2 ? "upset" : s === 0 ? "poke" : "none";
+        return s === 1 ? "life" : s === 2 ? "upset" : s === 0 ? "task" : "none";
       }
       function vl(s) {
         if (!Number.isInteger(s)) return "";
-        return s === 1 ? "LIFE" : s === 2 ? "UPSET" : s === 0 ? "POKE" : "";
+        return s === 1 ? "IMPORTANT+" : s === 2 ? "IMPORTANT−" : s === 0 ? "TASK" : "";
       }
 
       function timeBubble(iso) {
@@ -646,7 +646,7 @@
         let r = all;
         if (f === "life")  r = all.filter((t) => t.trinary_state === 1);
         else if (f === "upset")  r = all.filter((t) => t.trinary_state === 2);
-        else if (f === "poke")   r = all.filter((t) => t.trinary_state === 0);
+        else if (f === "task")   r = all.filter((t) => t.trinary_state === 0);
         else if (f === "null") r = all.filter((t) => t.trinary_state === null);
         else if (f === "mobile") r = all.filter((t) => t.device === "mobile");
         else if (f === "computer")
@@ -658,7 +658,7 @@
         all: "a-all",
         life: "a-life",
         upset: "a-up",
-        poke: "a-poke",
+        task: "a-task",
         null: "a-up",
         mobile: "a-mob",
         computer: "a-mob",
