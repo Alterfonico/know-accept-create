@@ -61,4 +61,17 @@ _Opened: 2026-03-12 09:06Z — Closed: 2026-03-12 10:15Z_
 
 ## Handoff → Session 39
 
-The seven CLAUDE.md improvements sit for 24h (should be applied in S39 or later, not rushed). The three meverse-react v030 interaction improvements are ready to apply but should be gated on user review first — pick one or all three approaches. Branch cleanup safety is now in CLAUDE.md; next close ritual must verify it holds. The youthful-raman branch is protected; respect that boundary. Warp trial succeeded (AGENTS.md shipped); assess whether Warp stays enabled or returns to standard mode. Two stale worktree branches (agitated-chebyshev, youthful-raman) need cleanup — agitated-chebyshev was rebased in this session and is ready to delete if old work is confirmed.
+**Completed since session close:**
+- Branch deletion invariant elevated from close ritual to Collaborator Rules (hard invariant, both user and Claude)
+- Audit cadence framework defined: micro (every session), complexity (every 5–7 sessions), full (at stage boundaries)
+- S38 review documented in open-issues.md: 7 CLAUDE.md improvements, branch cleanup test, parked work schema, Operator/Ghost operationalization needed
+- youthful-raman worktree + branch deleted (user explicit confirmation on record; entire branch was behind main)
+- agitated-chebyshev ready for deletion (rebased earlier, no unique content relative to main)
+- Main merged forward with all 4 new commits (session-38.md, CLAUDE.md, open-issues.md updates)
+
+**Pending for S39:**
+- The seven CLAUDE.md improvements listed in open-issues.md § Session Process — apply selectively after 24h review period
+- The three meverse-react v030 improvements (visual density, interaction model, filter discovery) — ready to apply but gated on user review
+- Branch cleanup rule test: verify agitated-chebyshev deletion and one-branch-per-session enforcement
+- Operationalize Operator/Ghost insight: add "Witness observations" section to open-issues.md, link to voltage patterns
+- Assess Warp trial outcome: stays enabled or returns to standard Claude mode for S39+
