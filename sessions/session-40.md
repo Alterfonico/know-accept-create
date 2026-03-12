@@ -88,3 +88,18 @@ _Opened: 2026-03-12 15:30Z — Closed: 2026-03-12 19:49Z_
 - `claude/xenodochial-knuth` — orphaned from S39, should be cleaned up
 
 **v070 ready to ship:** Reader is desktop-complete. Can be deployed to meverse-reader (port 4242). Works with live Supabase data. No known bugs. Right panel handles missing metadata gracefully (empty state messages). Mobile layout untested but markup is responsive-ready.
+
+**Process hardening — Merge authorization & session continuity (S40 final discussion):**
+
+Two safety mechanisms identified to prevent S38/crazy-cerf class failures (lost sessions, unauthorized merges):
+
+1. **Session file = anchor, not branch** — Once `sessions/session-N.md` is on main, the session is sealed even if worktree branch is deleted. Add to Close Ritual: before deleting a worktree branch, verify session file exists on main: `git show main:sessions/session-N.md`.
+
+2. **PR requirement before code merges to main** — Claude never merges `claude/funny-roentgen` → main directly. Instead: open PR, user reviews diff, user approves merge. Three implementation options:
+   - **Option A (strongest):** GitHub branch protection rule requiring PR + approval before any merge to main
+   - **Option B:** Pre-push git hook blocking `git push origin main` from CLI
+   - **Option C:** Protocol-only rule in CLAUDE.md (requires discipline)
+
+   **Recommendation:** Implement Option A + B (server-side + local safety). Add rules to CLAUDE.md Collaborator Rules section.
+
+This decision emerged from discussing how to prevent what happened in S38. The mechanisms are ready to implement in S41.
