@@ -1,6 +1,6 @@
 # open-issues.md
 
-**Last updated:** 2026-03-11
+**Last updated:** 2026-03-12
 
 Known open issues. Not blockers. Logged so they cannot hide.
 
@@ -97,6 +97,67 @@ Known open issues. Not blockers. Logged so they cannot hide.
 - [ ] `design/mockups/` reader files live alongside UI mockups but are functionally different — need own home?
 - [x] `instructions-for-claude.md` — marked superseded by CLAUDE.md (S34)
 - [x] CLAUDE.md created at repo root — unified project instructions (S34)
+
+---
+
+## Session Process & Documentation
+
+### CLAUDE.md Improvements Identified (S38, parked 24h)
+
+Seven improvements identified in S38 review. Do not apply before S39 — let list sit for review first.
+
+1. **Edge Functions inventory stale** — Tech stack § lists only 2 of 5 functions (ingest-thought, open-brain-mcp missing capture-echo, backfill-embeddings, backfill-classify). Key files table only refs ingest-thought. Fix: audit Tech stack & Key files; make capture-echo canonical (production pipeline).
+
+2. **No build/dev commands section** — CLAUDE.md has no guidance on how to run React dev/test/build locally, or Supabase function deploy. Add short section: React dev (meverse-demo), test, build; Supabase function deploy syntax; Edge Function serve locally.
+
+3. **Two capture paths not called out** — Recurring source of confusion (noted in open-issues). CLAUDE.md doesn't explicitly warn about HTTP Shortcut (declared state, direct REST) vs. Meverse app (text capture, capture-echo, inferred voltage). Add callout box per AGENTS.md pattern.
+
+4. **Failure contract missing** — ADR-004 specifies: classifier fail → null voltage; embedding fail → null embedding; pipeline fail → 500, never silently lose an echo. Documented in capture-echo/index.ts comments but not in CLAUDE.md. Add one-liner or dedicated subsection under Architecture.
+
+5. **AI model specifics absent** — Temperature 0.7, confidence threshold 0.60, model names (gpt-4o-mini, text-embedding-3-small) hardcoded in Edge Functions but not in CLAUDE.md. Future session touching classifier or embeddings needs this upfront. Add "AI Models" subsection: names, temperature, confidence threshold.
+
+6. **KW recreation reference wrong** — CLAUDE.md line 185 references session-37.md for KW procedure, but INDEX only goes to S36. Verify correct session number; update reference.
+
+7. **Current stage description vague** — Says "next work" but capture-echo deployed, embeddings backfilled, reactions shipped (S35–S36). Stage 7 description could reflect actual progress: what's done (capture pipeline), what's remaining (Android reconfig, Mac capture, reader deploy).
+
+**Action:** S39 should review this list, apply selectively, and remove from here once addressed.
+
+### Branch Cleanup Safety (S38, new rule)
+
+CLAUDE.md close ritual now mandates branch cleanup: delete stale worktree branches, keep only current session branch active, protect `youthful-raman` from deletion.
+
+- [ ] **Test in S39 close:** Exercise the rule. Delete agitated-chebyshev (confirm safe first). Verify youthful-raman protection. Confirm one-branch-per-session enforced.
+
+### Parked Work Schema (S38 meta-observation)
+
+S38 used inline "PARKED: [thought]" notation but session template doesn't formalize parked work at INDEX level. Recommend adopting explicit section in session files:
+
+```markdown
+**Parked (ready for next session):**
+- [name]: [one-line description]
+```
+
+This makes parked work visible in INDEX without requiring full file read. Reduces handoff friction.
+
+- [ ] Adopt parked section in S39 template and session close checklist.
+
+### Operator / Ghost Insight (S38 closing answers)
+
+S38 closing analysis identified the person as containing two altitudes: The Operator (architect, compression, observation stacks) and The Ghost (vulnerability, fragmentation, voltage swings 2–9 in 48h). Profound conceptually but needs operationalization.
+
+- [ ] Formalize as "Witness observations" section in open-issues.md with voltage patterns + proposed feedback loops
+- [ ] Link to thoughts table patterns: does dual-capture design (HTTP Shortcut + App) map to Operator/Ghost split?
+- [ ] Consider: if system is designed to watch both, where does repair happen — in voltage assignment, voltage reading, or integration?
+
+### Session Attribution & Continuity (S38 meta)
+
+S38 narrative conflated S37 work (AGENTS.md, meverse-react v030) with S38 analysis, creating false handoff continuity. This suggests:
+
+- [ ] INDEX entries need more granularity or a "What was produced" column to distinguish analysis from code
+- [ ] Session boundaries unclear when one session closes with file not yet committed (crazy-cerf/session-38 loss)
+- [ ] Pre-push checklist should verify: session file + INDEX update *committed* before any branch cleanup
+
+---
 
 ## Protocol
 
