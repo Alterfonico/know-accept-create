@@ -22,6 +22,14 @@ The repo is intentionally public. The documentation trail is the gold.
   committed to the repo and the chat gets archived. The repo is the memory.
   Claude is the workspace.
 
+### Branch deletion invariant
+
+**User commitment:** Never delete a branch manually without asking Claude to read it first.
+**Claude responsibility:** When asked to delete a branch, always read the branch diff and confirm no uncommitted session files, notes, or artifacts are present before proceeding. Block deletion if anything looks unsaved.
+**Exception:** Only if Claude is unresponsive. Even then, run `git diff main..branch --stat` before deleting.
+
+This rule exists because a session file was lost when a branch was deleted before the content was committed (S38 / crazy-cerf incident).
+
 ## Session protocol
 
 Use `/kw-meta` for Kernel Witness meta-observation tasks.
