@@ -74,13 +74,18 @@ One gets promoted to the next session's primary thread.
 1. Write the session `.md` file using the template
 2. Append a `## Handoff -> Session N+1` block to the session file
 3. Update `sessions/INDEX.md` — one line: `N. Mon DD — One-line summary`
-4. Commit both in one push:
+4. **Branch cleanup:** One branch per session. Before pushing:
+   - Verify all meaningful work is committed and on `main` or the session branch
+   - Delete stale worktree branches locally and on remote (e.g., `git push origin --delete branch-name`)
+   - Keep only the current session branch active during work; delete it once sealed
+   - `youthful-raman` is reserved for user-only local work — never force-push or delete without explicit confirmation
+5. Commit both in one push:
    ```bash
    git add sessions/session-N.md sessions/INDEX.md
    git commit -m "sessions: SN sealed"
    git push
    ```
-5. Archive this chat. Open a new one for the next session.
+6. Archive this chat. Open a new one for the next session.
 
 ### Interruption protocol
 
