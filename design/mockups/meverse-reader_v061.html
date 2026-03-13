@@ -1,0 +1,935 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"
+    />
+    <title>Echo Chamber</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;1,300&family=Syne:wght@700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #07070d;
+        --bg2: #0d0d18;
+        --bg3: #111122;
+        --life: #7df9c2;
+        --upset: #ff6b6b;
+        --poke: #ffb347;
+        --purple: #a78bfa;
+        --text: #d0d0d8;
+        --dim: #484860;
+        --dim2: #2e2e45;
+        --border: rgba(255, 255, 255, 0.05);
+        --bubble: #12121e;
+        --mono: "IBM Plex Mono", monospace;
+        --disp: "Syne", sans-serif;
+        --safe-t: env(safe-area-inset-top, 0px);
+        --safe-b: env(safe-area-inset-bottom, 0px);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--mono);
+        height: 100dvh;
+        overflow: hidden;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      /* ════════════════════════════════
+   LAYOUT
+════════════════════════════════ */
+      .app {
+        display: flex;
+        flex-direction: column;
+        height: 100dvh;
+      }
+
+      /* ════════════════════════════════
+   TOP NAV
+════════════════════════════════ */
+      .topnav {
+        flex-shrink: 0;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        padding: calc(var(--safe-t) + 10px) 16px 10px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .nav-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--bg3);
+        border: 1px solid rgba(125, 249, 194, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .nav-avatar-inner {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--life);
+        box-shadow: 0 0 8px var(--life);
+        animation: breathe 2.8s ease-in-out infinite;
+      }
+      @keyframes breathe {
+        0%,
+        100% {
+          opacity: 0.4;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.3);
+        }
+      }
+
+      .nav-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .nav-name {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: 3px;
+        line-height: 1.2;
+      }
+      .nav-sub {
+        font-size: 9px;
+        letter-spacing: 1.5px;
+        color: var(--dim);
+        margin-top: 1px;
+      }
+
+      .nav-actions {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .nav-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--dim);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .nav-btn:active {
+        background: var(--bg2);
+        color: var(--text);
+      }
+
+      /* filter pill row hidden by default, toggled */
+      .filter-wrap {
+        flex-shrink: 0;
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        background: var(--bg);
+        border-bottom: 1px solid transparent;
+      }
+      .filter-wrap.open {
+        max-height: 50px;
+        border-bottom-color: var(--border);
+      }
+      .filter-bar {
+        display: flex;
+        gap: 6px;
+        padding: 9px 16px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .filter-bar::-webkit-scrollbar {
+        display: none;
+      }
+      .chip {
+        flex-shrink: 0;
+        padding: 4px 11px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        background: transparent;
+        color: var(--dim);
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 1.5px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .chip.a-all {
+        border-color: rgba(255, 255, 255, 0.2);
+        color: var(--text);
+      }
+      .chip.a-life {
+        border-color: rgba(125, 249, 194, 0.4);
+        color: var(--life);
+        background: rgba(125, 249, 194, 0.05);
+      }
+      .chip.a-up {
+        border-color: rgba(255, 107, 107, 0.4);
+        color: var(--upset);
+        background: rgba(255, 107, 107, 0.05);
+      }
+      .chip.a-task {
+        border-color: rgba(255, 179, 71, 0.4);
+        color: var(--poke);
+        background: rgba(255, 179, 71, 0.05);
+      }
+      .chip.a-mob {
+        border-color: rgba(167, 139, 250, 0.4);
+        color: var(--purple);
+        background: rgba(167, 139, 250, 0.05);
+      }
+
+      /* ════════════════════════════════
+   CHAT AREA
+════════════════════════════════ */
+      .chat {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 12px 14px 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* ── date separator ── */
+      .date-sep {
+        align-self: center;
+        font-size: 9px;
+        letter-spacing: 1.8px;
+        color: var(--dim);
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 3px 10px;
+        margin: 10px 0 4px;
+        text-transform: lowercase;
+      }
+
+      /* ── message row ── */
+      .msg {
+        display: flex;
+        justify-content: flex-end;
+        padding: 0 2px;
+        opacity: 0;
+        transform: translateY(8px);
+        transition:
+          opacity 0.3s ease,
+          transform 0.3s ease;
+      }
+      .msg.visible {
+        opacity: 1;
+        transform: none;
+      }
+      .msg.new-group {
+        margin-top: 8px;
+      }
+
+      /* ── bubble ── */
+      .bubble {
+        max-width: 78%;
+        background: var(--bubble);
+        border-radius: 16px 16px 3px 16px;
+        padding: 9px 12px 7px;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* left-side state stripe */
+      .bubble::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+      }
+      .v-life .bubble::after {
+        background: var(--life);
+        box-shadow: 2px 0 8px rgba(125, 249, 194, 0.3);
+      }
+      .v-upset .bubble::after {
+        background: var(--upset);
+        box-shadow: 2px 0 8px rgba(255, 107, 107, 0.3);
+      }
+      .v-task .bubble::after {
+        background: var(--poke);
+        box-shadow: 2px 0 6px rgba(255, 179, 71, 0.25);
+      }
+      .v-none .bubble::after {
+        background: transparent;
+      }
+
+      .bubble-txt {
+        font-size: 14px;
+        line-height: 1.7;
+        color: var(--text);
+        padding-left: 6px;
+        word-break: break-word;
+      }
+
+      .bubble-foot {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 4px;
+        padding-left: 6px;
+      }
+      .b-time {
+        font-size: 9px;
+        letter-spacing: 1px;
+        color: var(--dim);
+      }
+      .b-state {
+        font-size: 9px;
+        letter-spacing: 0.5px;
+      }
+      .b-dev {
+        font-size: 8px;
+        color: var(--dim);
+        opacity: 0.45;
+        margin-left: auto;
+      }
+      .st-life {
+        color: var(--life);
+      }
+      .st-upset {
+        color: var(--upset);
+      }
+      .st-task {
+        color: var(--poke);
+      }
+      .st-none {
+        color: var(--dim);
+      }
+
+      /* ── loading ── */
+      #loading {
+        align-self: center;
+        margin: auto;
+        font-size: 10px;
+        letter-spacing: 2.5px;
+        color: var(--dim);
+        animation: flicker 1.6s ease-in-out infinite;
+      }
+      @keyframes flicker {
+        0%,
+        100% {
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      #error {
+        display: none;
+        align-self: stretch;
+        margin: 16px;
+        padding: 14px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 107, 107, 0.2);
+        background: rgba(255, 107, 107, 0.04);
+        font-size: 10px;
+        line-height: 1.9;
+        color: var(--upset);
+      }
+
+      /* ════════════════════════════════
+   INPUT BAR
+════════════════════════════════ */
+      .input-bar {
+        flex-shrink: 0;
+        background: var(--bg);
+        border-top: 1px solid var(--border);
+        padding: 10px 14px calc(var(--safe-b) + 10px);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .input-pill {
+        flex: 1;
+        background: var(--bg2);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 22px;
+        padding: 11px 16px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--dim);
+        font-style: italic;
+        letter-spacing: 0.02em;
+        pointer-events: none;
+        user-select: none;
+      }
+
+      .send-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(125, 249, 194, 0.08);
+        border: 1px solid rgba(125, 249, 194, 0.2);
+        color: var(--life);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: all 0.15s;
+      }
+      .send-btn:active {
+        background: rgba(125, 249, 194, 0.15);
+      }
+
+      /* ════════════════════════════════
+   BUBBLE EXPANSION
+════════════════════════════════ */
+      .bubble {
+        cursor: pointer;
+        transition: border-color 0.15s;
+      }
+      .bubble:hover {
+        border-color: rgba(255, 255, 255, 0.09);
+      }
+
+      /* the detail drawer lives inside the bubble */
+      .bubble-detail {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                    opacity 0.2s ease;
+        opacity: 0;
+      }
+      .bubble.expanded .bubble-detail {
+        max-height: 240px;
+        opacity: 1;
+      }
+
+      .bubble-detail-inner {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        padding: 8px 6px 2px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        margin-top: 6px;
+      }
+
+      .bd-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+      .bd-key {
+        font-size: 8px;
+        letter-spacing: 1.5px;
+        color: var(--dim);
+        text-transform: uppercase;
+        flex-shrink: 0;
+      }
+      .bd-val {
+        font-size: 9px;
+        color: var(--text);
+        opacity: 0.55;
+        text-align: right;
+      }
+      .bd-val.st-life  { color: var(--life);  opacity: 1; }
+      .bd-val.st-upset { color: var(--upset); opacity: 1; }
+      .bd-val.st-poke  { color: var(--poke);  opacity: 1; }
+
+      /* ── ai read summary ── */
+      .bd-ai-read {
+        font-size: 10px;
+        line-height: 1.5;
+        color: var(--dim);
+        font-style: italic;
+        opacity: 0.7;
+        margin-top: 6px;
+        padding: 0 6px;
+      }
+
+      /* ── inquiry button ── */
+      .bd-inquiry {
+        margin-top: 6px;
+        padding-top: 6px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .inquiry-btn {
+        display: block;
+        width: 100%;
+        background: transparent;
+        border: 1px solid rgba(167, 139, 250, 0.25);
+        border-radius: 8px;
+        padding: 6px 8px;
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 1px;
+        color: var(--purple);
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .inquiry-btn:hover {
+        background: rgba(167, 139, 250, 0.08);
+        border-color: rgba(167, 139, 250, 0.4);
+      }
+      .inquiry-btn:active {
+        background: rgba(167, 139, 250, 0.12);
+      }
+
+      /* ── inquiry modal (hidden by default) ── */
+      .inquiry-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+      .inquiry-modal.open {
+        display: flex;
+      }
+      .inquiry-modal-content {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      }
+      .inquiry-modal-title {
+        font-family: var(--disp);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: #fff;
+        margin-bottom: 10px;
+      }
+      .inquiry-modal-hint {
+        font-size: 9px;
+        letter-spacing: 0.8px;
+        color: var(--dim);
+        margin-bottom: 10px;
+      }
+      .inquiry-input {
+        width: 100%;
+        background: var(--bg2);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 8px;
+        padding: 10px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+        resize: vertical;
+        min-height: 60px;
+        margin-bottom: 10px;
+        transition: border-color 0.15s;
+      }
+      .inquiry-input:focus {
+        outline: none;
+        border-color: rgba(167, 139, 250, 0.3);
+        background: rgba(167, 139, 250, 0.02);
+      }
+      .inquiry-actions {
+        display: flex;
+        gap: 8px;
+      }
+      .inquiry-cancel,
+      .inquiry-submit {
+        flex: 1;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.15s;
+        border: none;
+      }
+      .inquiry-cancel {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--dim);
+      }
+      .inquiry-cancel:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .inquiry-submit {
+        background: rgba(167, 139, 250, 0.12);
+        border: 1px solid rgba(167, 139, 250, 0.3);
+        color: var(--purple);
+      }
+      .inquiry-submit:hover {
+        background: rgba(167, 139, 250, 0.18);
+      }
+      .inquiry-submit:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <!-- TOP NAV -->
+      <nav class="topnav">
+        <div class="nav-avatar">
+          <div class="nav-avatar-inner"></div>
+        </div>
+        <div class="nav-info">
+          <div class="nav-name">ECHO CHAMBER</div>
+          <div class="nav-sub" id="nav-sub">···</div>
+        </div>
+        <div class="nav-actions">
+          <button class="nav-btn" id="filter-toggle" title="filter">⊹</button>
+        </div>
+      </nav>
+
+      <!-- FILTER BAR (collapsible) -->
+      <div class="filter-wrap" id="filter-wrap">
+        <div class="filter-bar">
+          <button class="chip a-all" data-f="all">all</button>
+          <button class="chip" data-f="life">● important+</button>
+          <button class="chip" data-f="upset">● important−</button>
+          <button class="chip" data-f="task">● task</button>
+          <button class="chip" data-f="null">● raw</button>
+          <button class="chip" data-f="mobile">mobile</button>
+          <button class="chip" data-f="computer">computer</button>
+        </div>
+      </div>
+
+      <!-- CHAT -->
+      <div class="chat" id="chat">
+        <div id="loading">reading your echoes ···</div>
+        <div id="error"></div>
+      </div>
+
+      <!-- INPUT BAR -->
+      <div class="input-bar">
+        <div class="input-pill">capture via HTTP Shortcuts ···</div>
+        <div class="send-btn">↑</div>
+      </div>
+    </div>
+
+    <!-- INQUIRY MODAL (hidden until triggered) -->
+    <div class="inquiry-modal" id="inquiry-modal">
+      <div class="inquiry-modal-content">
+        <div class="inquiry-modal-title">ask about this ></div>
+        <div class="inquiry-modal-hint">What would you like to know?</div>
+        <textarea
+          class="inquiry-input"
+          id="inquiry-input"
+          placeholder="Your question..."
+          maxlength="500"
+        ></textarea>
+        <div class="inquiry-actions">
+          <button class="inquiry-cancel" id="inquiry-cancel">cancel</button>
+          <button class="inquiry-submit" id="inquiry-submit">submit</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script>
+      const db = supabase.createClient(
+        "https://nlfryozynimffhwkhhls.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sZnJ5b3p5bmltZmZod2toaGxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTExMDAsImV4cCI6MjA4ODEyNzEwMH0.VWLopIlZi7ad6MNA84LEo7ztiWBylzJ6g5Y1jHav1zw",
+      );
+
+      let all = [],
+        activeF = "all",
+        currentInquiryThoughtId = null;
+
+      /* ── helpers ── */
+      function vc(s) {
+        if (!Number.isInteger(s)) return "none";
+        return s === 1 ? "life" : s === 2 ? "upset" : s === 0 ? "task" : "none";
+      }
+      function vl(s) {
+        if (!Number.isInteger(s)) return "";
+        return s === 1 ? "IMPORTANT+" : s === 2 ? "IMPORTANT−" : s === 0 ? "TASK" : "";
+      }
+
+      function timeBubble(iso) {
+        if (!iso) return "";
+        return new Date(iso).toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+      function dateLabel(iso) {
+        if (!iso) return "";
+        const d = new Date(iso);
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        const yest = new Date(now);
+        yest.setDate(now.getDate() - 1);
+        const day = new Date(d);
+        day.setHours(0, 0, 0, 0);
+        if (+day === +now) return "today";
+        if (+day === +yest) return "yesterday";
+        return d.toLocaleDateString("en-GB", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+        });
+      }
+      function esc(s) {
+        return String(s || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      /* ── inquiry modal handlers ── */
+      function openInquiry(thoughtId) {
+        currentInquiryThoughtId = thoughtId;
+        document.getElementById("inquiry-input").value = "";
+        document.getElementById("inquiry-modal").classList.add("open");
+        document.getElementById("inquiry-input").focus();
+      }
+
+      function closeInquiry() {
+        document.getElementById("inquiry-modal").classList.remove("open");
+        currentInquiryThoughtId = null;
+      }
+
+      async function submitInquiry() {
+        const question = document.getElementById("inquiry-input").value.trim();
+        if (!question) return;
+        if (!currentInquiryThoughtId) return;
+
+        const btn = document.getElementById("inquiry-submit");
+        btn.disabled = true;
+        btn.textContent = "sending...";
+
+        try {
+          const { data, error } = await db
+            .from("inquiries")
+            .insert([
+              {
+                thought_id: currentInquiryThoughtId,
+                user_question: question,
+              },
+            ])
+            .select();
+
+          if (error) {
+            console.error("Inquiry insert failed:", error);
+            alert(`Error: ${error.message}`);
+            return;
+          }
+
+          console.log("Inquiry submitted:", data);
+          alert("✓ Inquiry recorded. KW will respond on next scan (~4h).");
+          closeInquiry();
+        } catch (e) {
+          console.error("Inquiry failed:", e);
+          alert("Error submitting inquiry. Check console.");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "submit";
+        }
+      }
+
+      document.getElementById("inquiry-cancel").addEventListener("click", closeInquiry);
+      document.getElementById("inquiry-submit").addEventListener("click", submitInquiry);
+      document.getElementById("inquiry-input").addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && e.ctrlKey) submitInquiry();
+      });
+      document.getElementById("inquiry-modal").addEventListener("click", (e) => {
+        if (e.target === document.getElementById("inquiry-modal")) closeInquiry();
+      });
+
+      /* ── render ── */
+      function render(thoughts) {
+        const chat = document.getElementById("chat");
+        chat.querySelectorAll(".msg,.date-sep").forEach((el) => el.remove());
+
+        const count = thoughts.length;
+        document.getElementById("nav-sub").textContent =
+          count + " echo" + (count !== 1 ? "es" : "") + " · open brain";
+
+        if (!count) return;
+
+        const ordered = [...thoughts].reverse(); // oldest first
+        let lastDL = null,
+          lastMin = null;
+
+        ordered.forEach((t, i) => {
+          const dl = dateLabel(t.created_at);
+          if (dl !== lastDL) {
+            const sep = document.createElement("div");
+            sep.className = "date-sep";
+            sep.textContent = dl;
+            chat.appendChild(sep);
+            lastDL = dl;
+            lastMin = null;
+          }
+
+          const v = vc(t.trinary_state);
+          const vLabel = vl(t.trinary_state);
+          const tBub = timeBubble(t.created_at);
+          const thisM = t.created_at
+            ? Math.floor(new Date(t.created_at) / 60000)
+            : 0;
+          const isNew = lastMin === null || thisM - lastMin > 5;
+          lastMin = thisM;
+
+          const msg = document.createElement("div");
+          msg.className = "msg v-" + v + (isNew ? " new-group" : "");
+          const fullTs = t.created_at
+            ? new Date(t.created_at).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })
+            : "—";
+
+          const detailRows = [
+            ["time",   fullTs,               ""],
+            ["state",  vLabel || "—",        vLabel ? "st-" + v : ""],
+          ].map(([k, val, cls]) =>
+            `<div class="bd-row">
+              <span class="bd-key">${k}</span>
+              <span class="bd-val ${cls}">${esc(val)}</span>
+            </div>`
+          ).join("");
+
+          const aiReadHtml = t.ai_read
+            ? `<div class="bd-ai-read">${esc(t.ai_read)}</div>`
+            : "";
+
+          msg.innerHTML = `
+      <div class="bubble">
+        <div class="bubble-txt">${esc(t.content)}</div>
+        <div class="bubble-foot">
+          <span class="b-time">${tBub}</span>
+          ${vLabel ? `<span class="b-state st-${v}">${vLabel}</span>` : ""}
+          ${t.device ? `<span class="b-dev">${esc(t.device)}</span>` : ""}
+        </div>
+        <div class="bubble-detail">
+          <div class="bubble-detail-inner">
+            ${detailRows}
+            ${aiReadHtml}
+            <div class="bd-inquiry">
+              <button class="inquiry-btn" data-thought-id="${t.id}">ask about this ></button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+          msg.querySelector(".bubble").addEventListener("click", function () {
+            this.classList.toggle("expanded");
+          });
+
+          msg.querySelector(".inquiry-btn").addEventListener("click", (e) => {
+            e.stopPropagation();
+            openInquiry(e.target.dataset.thoughtId);
+          });
+
+          chat.appendChild(msg);
+          setTimeout(() => msg.classList.add("visible"), 10 + i * 15);
+        });
+
+        requestAnimationFrame(() => {
+          chat.scrollTop = chat.scrollHeight;
+        });
+      }
+
+      /* ── filter ── */
+      function applyFilter(f) {
+        let r = all;
+        if (f === "life")  r = all.filter((t) => t.trinary_state === 1);
+        else if (f === "upset")  r = all.filter((t) => t.trinary_state === 2);
+        else if (f === "task")   r = all.filter((t) => t.trinary_state === 0);
+        else if (f === "null") r = all.filter((t) => t.trinary_state === null);
+        else if (f === "mobile") r = all.filter((t) => t.device === "mobile");
+        else if (f === "computer")
+          r = all.filter((t) => t.device === "computer");
+        render(r);
+      }
+
+      const acMap = {
+        all: "a-all",
+        life: "a-life",
+        upset: "a-up",
+        task: "a-task",
+        null: "a-up",
+        mobile: "a-mob",
+        computer: "a-mob",
+      };
+      document.querySelectorAll(".chip").forEach((c) => {
+        c.addEventListener("click", () => {
+          document
+            .querySelectorAll(".chip")
+            .forEach((x) => (x.className = "chip"));
+          const f = c.dataset.f;
+          c.classList.add(acMap[f] || "a-all");
+          activeF = f;
+          applyFilter(f);
+        });
+      });
+
+      /* ── filter toggle ── */
+      document.getElementById("filter-toggle").addEventListener("click", () => {
+        document.getElementById("filter-wrap").classList.toggle("open");
+      });
+
+      /* ── load ── */
+      async function load() {
+        const { data, error } = await db
+          .from("thoughts")
+          .select(
+            "id,content,created_at,trinary_state,state_source,device,input_type,ai_read",
+          )
+          .order("created_at", { ascending: false })
+          .limit(150);
+
+        document.getElementById("loading").style.display = "none";
+
+        if (error) {
+          const el = document.getElementById("error");
+          el.style.display = "block";
+          el.innerHTML = `<strong>read failed</strong><br><br>${esc(error.message)}`;
+          return;
+        }
+        all = data || [];
+        applyFilter(activeF);
+      }
+
+      load();
+    </script>
+  </body>
+</html>
