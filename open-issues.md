@@ -193,3 +193,9 @@ Everything else follows the roadmap.
 - **Type:** CLASSIFIER_FAILURE
 - **Evidence:** 6 of 20 rows have trinary_state=null and state_source=null. 3 of these also have null device/input_type (16:14Z–16:20Z range, likely capture-echo path where classifier may have failed or returned below confidence threshold). The other 3 (14:32Z, 17:13Z, 17:19Z) have device=mobile, input_type=text but null voltage — these arrived via HTTP Shortcuts without a declared state.
 - **Rows affected:** 6/20 in window 14:31Z–17:45Z (all 2026-03-11)
+
+### [2026-03-13 16:10Z] Friction: N/A
+- **Type:** TOOL_UNAVAILABLE
+- **Evidence:** `kw-supabase-config.json` not present on disk (gitignored, not restored). Cannot call Supabase REST API. Pipeline state unknown.
+- **Rows affected:** 0/20 — scan not possible
+- **Note:** KW_SILENT condition persists. Last KW scan: 2026-03-11 19:02Z (~45h ago, ~11 missed cycles). WP flagged KW_SILENT in both Cycle 1 and Cycle 2 audits. Config restore required to resume monitoring.

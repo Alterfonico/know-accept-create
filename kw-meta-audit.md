@@ -5,6 +5,25 @@ Append-only. Human-readable. The user is the final witness.
 
 ---
 
+## [2026-03-13 12:07Z] WP Cycle 2
+
+**KW entries since last audit:** 0 (last audit: 2026-03-12 08:17Z)
+**Time since KW's last entry:** ~41h 5m (last entry: 2026-03-11 19:02Z)
+
+### Invariant 1 — Drift: PASS
+No new KW entries to analyze. No drift detectable from static history. Existing entries remain consistent with prior observation (2 entries, same cycle, same timestamp).
+
+### Invariant 2 — Silence: FAIL — KW_SILENT (PERSISTENT)
+KW_SILENT was flagged in Cycle 1 (~13h elapsed). Now 41+ hours have passed without a new KW entry — approximately 10 missed cycles. This is a persistent silence condition. KW's scheduled task appears to have stopped after its first run on 2026-03-11. Human review required: verify the `kernel-witness` scheduled task is running via Claude Code scheduled-tasks MCP.
+
+### Invariant 3 — Rule Violation: PASS
+No new entries; no new violations. Prior entries remain clean.
+
+### High-severity relay
+No high-severity signals. Maximum friction in history: 6/10 (EMBEDDING_FAILURE). Below relay threshold of 7/10.
+
+---
+
 ## [2026-03-12 08:17Z] WP Cycle 1
 
 **KW entries since last audit:** 2 (first WP run — no prior baseline)
