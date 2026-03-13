@@ -17,4 +17,3 @@ supabase/.temp/
 # Claude Code
 .claude/
 ../meverse-agents-vault/
-kw-supabase-config.json

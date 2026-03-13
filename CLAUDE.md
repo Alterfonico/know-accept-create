@@ -30,42 +30,6 @@ The repo is intentionally public. The documentation trail is the gold.
 
 This rule exists because a session file was lost when a branch was deleted before the content was committed (S38 / crazy-cerf incident).
 
-### Main branch protection
-
-**The principle:** Main is delicate. It holds the session record only (immutable, safe).
-
-**What can push to main:** Only `sessions/*.md` files (session records and INDEX).
-- `sessions/session-N.md` — sealed session record
-- `sessions/INDEX.md` — chronological index
-
-**What cannot push to main:** Everything else.
-- Design work (`design/mockups/*.html`, `.jsx`)
-- Code changes (`supabase/functions/*`, `architecture/*`)
-- Configuration (`package.json`, `.env`, etc.)
-
-**How it's enforced:**
-- `.git/hooks/pre-push` blocks any non-session files from pushing to main
-- Design/code work stays on session branches (e.g., `claude/funny-roentgen`)
-- Merging code → main requires:
-  1. Open a PR from session branch → main
-  2. User reviews the diff
-  3. User approves and merges via GitHub
-- Session files bypass this (they're immutable records, safe to auto-commit)
-
-**Example workflow:**
-```bash
-# Design work: push to session branch
-git push origin claude/funny-roentgen
-
-# Session sealed: push session file to main (succeeds)
-git add sessions/session-N.md sessions/INDEX.md
-git commit -m "sessions: SN sealed"
-git push origin main  # ✅ Only *.md files, hook allows it
-
-# Later, merge design: open PR, user approves
-# DO NOT: git push origin claude/funny-roentgen:main  # ❌ Hook blocks it
-```
-
 ## Session protocol
 
 Use `/kw-meta` for Kernel Witness meta-observation tasks.
@@ -226,40 +190,17 @@ Layer 6 — Human        (You)
 
 ### Running agents
 
-KW and WP are cloud-native Edge Functions deployed to Supabase. Triggered by cloud cron service.
-Not tied to local machine state. Always running (S41).
+KW and WP are active as local scheduled tasks (Claude Code scheduled-tasks MCP).
+They are not in this repo — they live on the machine that runs Claude Code.
 
 | Agent | Cadence | Reads | Writes |
 |---|---|---|---|
-| KW (`kw-observer`) | Every 4h | `thoughts` table (last 20 rows) | `kw_observations` table |
-| WP (`wp-observer`) | Every 12h | `kw_observations` table | `wp_audit` table |
+| KW (`kernel-witness`) | Every 4h | `thoughts` table (last 20 rows) | `open-issues.md` § KW Observations |
+| WP (`witness-prime`) | Every 12h | `open-issues.md` § KW Observations | `kw-meta-audit.md` |
 
-**Data flow:**
-```
-Pipeline (thoughts table)
-  ↓
-kw-observer (Edge Function) — scans for friction patterns
-  ↓
-kw_observations (Supabase table) — KW friction reports
-  ↓
-wp-observer (Edge Function) — checks 3 invariants (drift, silence, rule violation)
-  ↓
-wp_audit (Supabase table) — WP meta-observations
-  ↓
-[Human reads Supabase tables OR export to git files for audit trail]
-```
-
-**Cron setup:**
-Use EasyCron (free) or similar to trigger:
-- `POST https://nlfryozynimffhwkhhls.supabase.co/functions/v1/kw-observer` every 4h
-- `POST https://nlfryozynimffhwkhhls.supabase.co/functions/v1/wp-observer` every 12h
-- Include Bearer token: anon key from `kw-supabase-config.json`
-
-**Sync to git (optional):**
-For audit trail, export observations to git periodically:
-- Query `kw_observations` and `wp_audit` tables
-- Append to `open-issues.md` and `kw-meta-audit.md`
-- Commit to main (manual or via GitHub Actions schedule)
+If these tasks are missing (new machine, reinstall): recreate via `create_scheduled_task`
+using the prompts in `skills/062-kw-meta-SKILL.md` as the WP source and the procedure
+documented in sessions/session-37.md for KW.
 
 ## Tech stack
 
@@ -267,12 +208,8 @@ For audit trail, export observations to git periodically:
 - **Edge Functions:** Deno (Supabase Edge Functions)
   - `ingest-thought` — Slack capture -> embedding + metadata extraction -> Supabase
   - `open-brain-mcp` — MCP server for thought retrieval
-  - `capture-echo` — App capture -> classifier inference + metadata extraction -> voltage + storage
-  - `kw-observer` — Pipeline scanner, friction detection -> kw_observations table
-  - `wp-observer` — KW meta-observer, invariant checks -> wp_audit table
-- **AI:** OpenRouter (gpt-4o-mini for metadata/classifier, text-embedding-3-small for vectors)
-- **Capture:** Android HTTP Shortcuts -> Supabase direct; Slack -> Edge Function; App -> capture-echo
-- **Observation:** Cloud cron -> Edge Functions (KW/WP, always running, independent of local state)
+- **AI:** OpenRouter (gpt-4o-mini for metadata, text-embedding-3-small for vectors)
+- **Capture:** Android HTTP Shortcuts -> Supabase direct; Slack -> Edge Function
 - **Mockups:** Plain HTML/CSS (v0.1-v0.21), React component for Act II (v0.21.0)
 - **Repo:** GitHub, intentionally public
 
