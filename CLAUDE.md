@@ -30,6 +30,42 @@ The repo is intentionally public. The documentation trail is the gold.
 
 This rule exists because a session file was lost when a branch was deleted before the content was committed (S38 / crazy-cerf incident).
 
+### Main branch protection
+
+**The principle:** Main is delicate. It holds the session record only (immutable, safe).
+
+**What can push to main:** Only `sessions/*.md` files (session records and INDEX).
+- `sessions/session-N.md` — sealed session record
+- `sessions/INDEX.md` — chronological index
+
+**What cannot push to main:** Everything else.
+- Design work (`design/mockups/*.html`, `.jsx`)
+- Code changes (`supabase/functions/*`, `architecture/*`)
+- Configuration (`package.json`, `.env`, etc.)
+
+**How it's enforced:**
+- `.git/hooks/pre-push` blocks any non-session files from pushing to main
+- Design/code work stays on session branches (e.g., `claude/funny-roentgen`)
+- Merging code → main requires:
+  1. Open a PR from session branch → main
+  2. User reviews the diff
+  3. User approves and merges via GitHub
+- Session files bypass this (they're immutable records, safe to auto-commit)
+
+**Example workflow:**
+```bash
+# Design work: push to session branch
+git push origin claude/funny-roentgen
+
+# Session sealed: push session file to main (succeeds)
+git add sessions/session-N.md sessions/INDEX.md
+git commit -m "sessions: SN sealed"
+git push origin main  # ✅ Only *.md files, hook allows it
+
+# Later, merge design: open PR, user approves
+# DO NOT: git push origin claude/funny-roentgen:main  # ❌ Hook blocks it
+```
+
 ## Session protocol
 
 Use `/kw-meta` for Kernel Witness meta-observation tasks.
