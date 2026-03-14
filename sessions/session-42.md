@@ -48,7 +48,6 @@ _Opened: 2026-03-13 15:30Z — Closed: 2026-03-13 16:35Z_
 **Branch state:**
 - `claude/s42-reader-bubbles` — active, reader v060-v063 committed. Push to remote or keep local — user decides.
 - `claude/s41-cloud-observer` — previous session branch. Do not delete without reading diff first (branch deletion invariant).
-- `youthful-raman` — reserved for user-only local work. Never touch.
 
 **Architecture state (unchanged from S41):**
 - Observation (KW/WP): ✓ deployed, cron NOT yet active

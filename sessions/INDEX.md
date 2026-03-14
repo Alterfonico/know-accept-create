@@ -44,6 +44,7 @@ A chronological narrative of each session. A witnessed record of how the system 
 40. Mar 12 — Reader v070 — 3-canvas desktop architecture, right panel live, 150 echoes with metadata
 41. Mar 13 — Cloud observer stack — KW/WP as Edge Functions, always-running, independent of local state
 42. Mar 13 — Reader bubbles — expanded panel with ai_read and ask-about-this wired, v062 canonical
+43. Mar 14 — Tangled drawer — v065 dark-mode mobile reader, three-state bubble, push layout fixed
 
 ---
 
