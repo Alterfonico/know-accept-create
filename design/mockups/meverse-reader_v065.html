@@ -37,16 +37,20 @@
       }
 
       /* ════ LAYOUT ════ */
-      .app { display: flex; flex-direction: row; height: 100dvh; }
-
-      .main-view {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        min-width: 0;
+      body { overflow-x: hidden; }
+      .app {
+        display: flex; flex-direction: row;
+        width: calc(100vw + 320px); height: 100dvh;
         transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
       }
-      .app.drawer-open .main-view { transform: translateX(-100%); }
+      .app.drawer-open { transform: translateX(-320px); }
+
+      .main-view {
+        width: 100vw;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+      }
 
       /* ════ TOP NAV ════ */
       .topnav {
@@ -250,18 +254,16 @@
 
       /* ════ RIGHT DRAWER (MOBILE TANGLED) ════ */
       .right-drawer {
-        position: fixed; top: 0; right: 0;
-        width: 100%; height: 100dvh;
+        width: 320px;
+        flex-shrink: 0;
+        height: 100dvh;
         background: var(--bg);
         display: flex; flex-direction: column;
         padding: calc(var(--safe-t) + 10px) 0 calc(var(--safe-b) + 10px);
-        transform: translateX(100%);
-        transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
-        z-index: 998;
-        /* TANGLED EFFECT: drawer has left border that mirrors voltage stripe */
+        /* TANGLED EFFECT: left border mirrors voltage */
         border-left: 3px solid rgba(255,255,255,0.1);
+        overflow-y: auto;
       }
-      .app.drawer-open .right-drawer { transform: translateX(0); }
 
       /* drawer header */
       .drawer-header {
@@ -508,7 +510,7 @@
           const stateClass = `st-${thought.voltage}`;
           html += `
             <div class="msg visible new-group">
-              <div class="bubble ${voltageClass}" data-id="${thought.id}" onclick="openDrawer(event, ${thought.id})">
+              <div class="bubble ${voltageClass}" data-id="${thought.id}">
                 <div class="bubble-txt">${thought.text}</div>
                 <div class="bubble-echo">${thought.ai_read}</div>
                 <div class="bubble-ask-link">ask about this ›</div>
@@ -522,10 +524,32 @@
           `;
         });
         chat.innerHTML = html;
+
+        // Wire semi-expand + ask-link per bubble
+        document.querySelectorAll('.bubble').forEach(bubble => {
+          const id = parseInt(bubble.dataset.id);
+          const askLink = bubble.querySelector('.bubble-ask-link');
+
+          bubble.addEventListener('click', function(e) {
+            if (askLink && askLink.contains(e.target)) return;
+            // Collapse any other expanded bubble
+            document.querySelectorAll('.bubble.expanded').forEach(b => {
+              if (b !== bubble) b.classList.remove('expanded');
+            });
+            bubble.classList.toggle('expanded');
+          });
+
+          if (askLink) {
+            askLink.addEventListener('click', function(e) {
+              e.stopPropagation();
+              openDrawer(id);
+            });
+          }
+        });
       }
 
       // Open drawer
-      function openDrawer(event, thoughtId) {
+      function openDrawer(thoughtId) {
         const thought = mockThoughts.find(t => t.id === thoughtId);
         if (!thought) return;
 
