@@ -91,6 +91,17 @@ Known open issues. Not blockers. Logged so they cannot hide.
 - [ ] HTTP Shortcuts `trinary_state` null model — declared state arriving as null not handled gracefully.
       Shortcut config fix, not a pipeline fix. Investigate HTTP Shortcuts variable binding.
 
+## Reader UI (Act III — Mirror)
+
+### Right Drawer (Mobile)
+
+- [ ] **Redundancy on drawer open (S43):** Node text appears twice when drawer slides in
+      — once in drawer header, once in visible bubble on left edge.
+      Decision needed: hide text on bubble when drawer open (clean drawer view) or leave
+      (acceptable repetition / anchoring the expanded state). User preference TBD.
+- [ ] Poem/witness verse rendering — v064 shows structure but not populated. Include in v065
+      or defer to S44? Currently marked as future feature.
+
 ## Repo Hygiene
 
 - [ ] `design/mockups/` has 27 HTML files (v0.1 through v0.21) — only latest matters for dev; archive old versions?
@@ -194,12 +205,14 @@ Everything else follows the roadmap.
 - **Evidence:** 6 of 20 rows have trinary_state=null and state_source=null. 3 of these also have null device/input_type (16:14Z–16:20Z range, likely capture-echo path where classifier may have failed or returned below confidence threshold). The other 3 (14:32Z, 17:13Z, 17:19Z) have device=mobile, input_type=text but null voltage — these arrived via HTTP Shortcuts without a declared state.
 - **Rows affected:** 6/20 in window 14:31Z–17:45Z (all 2026-03-11)
 
-### [2026-03-12 20:09Z] Friction: 8/10
+### [2026-03-13 16:10Z] Friction: N/A
 - **Type:** TOOL_UNAVAILABLE
-- **Evidence:** Supabase `execute_sql` MCP tool not present in this session environment. KW cannot query the `thoughts` table. Pipeline health is unverifiable. Last successful observation was 2026-03-11 19:02Z — gap of ~25h with no KW coverage.
-- **Rows affected:** Unknown — observation window could not be opened.
+- **Evidence:** `kw-supabase-config.json` not present on disk (gitignored, not restored). Cannot call Supabase REST API. Pipeline state unknown.
+- **Rows affected:** 0/20 — scan not possible
+- **Note:** KW_SILENT condition persists. Last KW scan: 2026-03-11 19:02Z (~45h ago, ~11 missed cycles). WP flagged KW_SILENT in both Cycle 1 and Cycle 2 audits. Config restore required to resume monitoring.
 
-### [2026-03-13 10:52Z] Friction: 8/10
-- **Type:** CLASSIFIER_FAILURE + EMBEDDING_FAILURE
-- **Evidence:** 12/20 rows have null trinary_state (classifier returned no voltage decision). 20/20 rows have null embedding (complete embedding pipeline failure). All rows in window arrived via HTTP Shortcuts (device=mobile, state_source=declared). Suggests: classifier not running on this input path, embeddings not backfilled for recent captures.
-- **Rows affected:** 20/20 in window 2026-03-12 20:27:39Z–2026-03-13 09:41:01Z
+### [2026-03-14 16:13Z] Friction: N/A
+- **Type:** TOOL_UNAVAILABLE
+- **Evidence:** `kw-supabase-config.json` not present on disk (gitignored, not restored). Cannot call Supabase REST API. Pipeline state unknown.
+- **Rows affected:** 0/20 — scan not possible
+- **Note:** KW_SILENT condition continues. Last successful scan: 2026-03-11 19:02Z (~93h ago, ~23 missed cycles). WP flagged KW_SILENT in Cycle 1 and Cycle 2. Previous TOOL_UNAVAILABLE logged 2026-03-13 16:10Z. Config restore required to resume monitoring.

@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+    <title>Echo Chamber</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;1,300&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #07070d;
+        --bg2: #0d0d18;
+        --bg3: #111122;
+        --life: #7df9c2;
+        --upset: #ff6b6b;
+        --poke: #ffb347;
+        --purple: #a78bfa;
+        --text: #d0d0d8;
+        --dim: #484860;
+        --dim2: #2e2e45;
+        --border: rgba(255,255,255,0.05);
+        --bubble: #12121e;
+        --mono: "IBM Plex Mono", monospace;
+        --disp: "Syne", sans-serif;
+        --safe-t: env(safe-area-inset-top, 0px);
+        --safe-b: env(safe-area-inset-bottom, 0px);
+      }
+
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      html, body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--mono);
+        height: 100dvh;
+        overflow: hidden;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      /* ════ LAYOUT ════ */
+      .app { display: flex; flex-direction: row; height: 100dvh; }
+
+      .main-view {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      }
+      .app.drawer-open .main-view { transform: translateX(-100%); }
+
+      /* ════ TOP NAV ════ */
+      .topnav {
+        flex-shrink: 0;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        padding: calc(var(--safe-t) + 10px) 16px 10px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .nav-avatar {
+        width: 36px; height: 36px; border-radius: 50%;
+        background: var(--bg3);
+        border: 1px solid rgba(125,249,194,0.15);
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+      }
+      .nav-avatar-inner {
+        width: 10px; height: 10px; border-radius: 50%;
+        background: var(--life);
+        box-shadow: 0 0 8px var(--life);
+        animation: breathe 2.8s ease-in-out infinite;
+      }
+      @keyframes breathe {
+        0%,100% { opacity: 0.4; transform: scale(1); }
+        50%      { opacity: 1;   transform: scale(1.3); }
+      }
+      .nav-info { flex: 1; min-width: 0; }
+      .nav-name {
+        font-family: var(--disp);
+        font-size: 15px; font-weight: 800;
+        color: #fff; letter-spacing: 3px; line-height: 1.2;
+      }
+      .nav-sub { font-size: 9px; letter-spacing: 1.5px; color: var(--dim); margin-top: 1px; }
+      .nav-actions { display: flex; gap: 6px; align-items: center; }
+      .nav-btn {
+        width: 32px; height: 32px; border-radius: 50%;
+        background: transparent; border: 1px solid var(--border);
+        color: var(--dim);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14px; cursor: pointer; transition: all 0.15s;
+      }
+      .nav-btn:active { background: var(--bg2); color: var(--text); }
+
+      /* ════ FILTER ════ */
+      .filter-wrap {
+        flex-shrink: 0; overflow: hidden;
+        max-height: 0; transition: max-height 0.3s cubic-bezier(0.16,1,0.3,1);
+        background: var(--bg); border-bottom: 1px solid transparent;
+      }
+      .filter-wrap.open { max-height: 50px; border-bottom-color: var(--border); }
+      .filter-bar {
+        display: flex; gap: 6px; padding: 9px 16px;
+        overflow-x: auto; scrollbar-width: none;
+      }
+      .filter-bar::-webkit-scrollbar { display: none; }
+      .chip {
+        flex-shrink: 0; padding: 4px 11px; border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.07);
+        background: transparent; color: var(--dim);
+        font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px;
+        cursor: pointer; transition: all 0.15s;
+      }
+      .chip.a-all   { border-color: rgba(255,255,255,0.2); color: var(--text); }
+      .chip.a-life  { border-color: rgba(125,249,194,0.4); color: var(--life);  background: rgba(125,249,194,0.05); }
+      .chip.a-up    { border-color: rgba(255,107,107,0.4); color: var(--upset); background: rgba(255,107,107,0.05); }
+      .chip.a-task  { border-color: rgba(255,179,71,0.4);  color: var(--poke);  background: rgba(255,179,71,0.05);  }
+      .chip.a-mob   { border-color: rgba(167,139,250,0.4); color: var(--purple);background: rgba(167,139,250,0.05); }
+
+      /* ════ CHAT ════ */
+      .chat {
+        flex: 1; overflow-y: auto; overflow-x: hidden;
+        padding: 12px 14px 8px;
+        display: flex; flex-direction: column; gap: 2px;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .date-sep {
+        align-self: center;
+        font-size: 9px; letter-spacing: 1.8px; color: var(--dim);
+        background: var(--bg2); border: 1px solid var(--border);
+        border-radius: 20px; padding: 3px 10px;
+        margin: 10px 0 4px; text-transform: lowercase;
+      }
+
+      /* ── message row ── */
+      .msg {
+        display: flex; justify-content: flex-end;
+        padding: 0 2px;
+        opacity: 0; transform: translateY(8px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+      }
+      .msg.visible  { opacity: 1; transform: none; }
+      .msg.new-group { margin-top: 8px; }
+
+      /* ════ BUBBLE ════ */
+      .bubble {
+        max-width: 100%;
+        background: var(--bubble);
+        border-radius: 16px 16px 3px 16px;
+        padding: 9px 12px 7px;
+        border: 1px solid rgba(255,255,255,0.04);
+        position: relative; overflow: hidden;
+        cursor: pointer;
+        transition: border-color 0.15s;
+      }
+      .bubble:hover { border-color: rgba(255,255,255,0.09); }
+
+      /* voltage stripe */
+      .bubble::after {
+        content: ""; position: absolute;
+        left: 0; top: 0; bottom: 0; width: 3px;
+      }
+      .v-life  .bubble::after { background: var(--life);  box-shadow: 2px 0 8px rgba(125,249,194,0.3); }
+      .v-upset .bubble::after { background: var(--upset); box-shadow: 2px 0 8px rgba(255,107,107,0.3); }
+      .v-task  .bubble::after { background: var(--poke);  box-shadow: 2px 0 6px rgba(255,179,71,0.25); }
+      .v-none  .bubble::after { background: transparent; }
+
+      .bubble-txt {
+        font-size: 14px; line-height: 1.7;
+        color: var(--text); padding-left: 6px;
+        word-break: break-word;
+      }
+
+      /* ── echo — hidden until expanded ── */
+      .bubble-echo {
+        display: none;
+        font-size: 10px; line-height: 1.65;
+        color: var(--dim); font-style: italic;
+        padding: 6px 6px 0; margin-top: 5px;
+        border-top: 1px solid rgba(255,255,255,0.04);
+      }
+      .bubble.expanded .bubble-echo { display: block; }
+
+      /* ── ask link — hidden until expanded ── */
+      .bubble-ask-link {
+        display: none;
+        font-size: 9px; letter-spacing: 0.8px;
+        color: var(--purple); opacity: 0.7;
+        text-align: right;
+        padding: 5px 6px 0;
+        cursor: pointer;
+        transition: opacity 0.15s;
+      }
+      .bubble-ask-link:hover { opacity: 1; }
+      .bubble.expanded .bubble-ask-link { display: block; }
+
+      .bubble-foot {
+        display: flex; align-items: center; gap: 5px;
+        margin-top: 5px; padding-left: 6px;
+      }
+      .b-time   { font-size: 9px; letter-spacing: 1px; color: var(--dim); }
+      .b-state  { font-size: 9px; letter-spacing: 0.5px; }
+      .st-life  { color: var(--life); }
+      .st-upset { color: var(--upset); }
+      .st-task  { color: var(--poke); }
+      .st-none  { color: var(--dim); }
+
+      /* loading / error */
+      #loading {
+        align-self: center; margin: auto;
+        font-size: 10px; letter-spacing: 2.5px; color: var(--dim);
+        animation: flicker 1.6s ease-in-out infinite;
+      }
+      @keyframes flicker { 0%,100%{opacity:0.3} 50%{opacity:1} }
+      #error {
+        display: none; align-self: stretch; margin: 16px; padding: 14px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,107,107,0.2);
+        background: rgba(255,107,107,0.04);
+        font-size: 10px; line-height: 1.9; color: var(--upset);
+      }
+
+      /* ════ INPUT BAR ════ */
+      .input-bar {
+        flex-shrink: 0; background: var(--bg);
+        border-top: 1px solid var(--border);
+        padding: 10px 14px calc(var(--safe-b) + 10px);
+        display: flex; align-items: center; gap: 10px;
+      }
+      .input-pill {
+        flex: 1; background: var(--bg2);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 22px; padding: 11px 16px;
+        font-family: var(--mono); font-size: 13px;
+        color: var(--dim); font-style: italic; letter-spacing: 0.02em;
+        pointer-events: none; user-select: none;
+      }
+      .send-btn {
+        width: 40px; height: 40px; border-radius: 50%;
+        background: rgba(125,249,194,0.08);
+        border: 1px solid rgba(125,249,194,0.2);
+        color: var(--life);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 16px; cursor: pointer; flex-shrink: 0;
+        transition: all 0.15s;
+      }
+      .send-btn:active { background: rgba(125,249,194,0.15); }
+
+      /* ════ RIGHT DRAWER (MOBILE TANGLED) ════ */
+      .right-drawer {
+        position: fixed; top: 0; right: 0;
+        width: 100%; height: 100dvh;
+        background: var(--bg);
+        display: flex; flex-direction: column;
+        padding: calc(var(--safe-t) + 10px) 0 calc(var(--safe-b) + 10px);
+        transform: translateX(100%);
+        transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+        z-index: 998;
+        /* TANGLED EFFECT: drawer has left border that mirrors voltage stripe */
+        border-left: 3px solid rgba(255,255,255,0.1);
+      }
+      .app.drawer-open .right-drawer { transform: translateX(0); }
+
+      /* drawer header */
+      .drawer-header {
+        display: flex; align-items: flex-start; gap: 10px;
+        padding: 0 16px 14px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+      .drawer-thought-title {
+        flex: 1; min-width: 0;
+        font-size: 13px; line-height: 1.6;
+        color: var(--text); font-family: var(--mono);
+        word-break: break-word;
+      }
+      .drawer-close {
+        width: 28px; height: 28px; border-radius: 50%;
+        background: transparent; border: 1px solid var(--border);
+        color: var(--dim);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14px; cursor: pointer; transition: all 0.15s;
+        flex-shrink: 0; margin-top: 2px;
+      }
+      .drawer-close:hover { color: var(--text); border-color: rgba(255,255,255,0.1); }
+
+      /* metadata 4-col grid */
+      .drawer-meta-grid {
+        display: grid; grid-template-columns: repeat(4,1fr);
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+      .dm-col { display: flex; flex-direction: column; gap: 5px; }
+      .dm-label { font-size: 7px; letter-spacing: 1.2px; color: var(--dim); text-transform: uppercase; }
+      .dm-value { font-size: 10px; color: var(--text); opacity: 0.8; line-height: 1.2; }
+      .dm-value.st-life  { color: var(--life);  opacity: 1; }
+      .dm-value.st-upset { color: var(--upset); opacity: 1; }
+      .dm-value.st-task  { color: var(--poke);  opacity: 1; }
+
+      /* scrollable body */
+      .drawer-body {
+        flex: 1; overflow-y: auto;
+        display: flex; flex-direction: column;
+      }
+
+      /* echo block */
+      .drawer-echo {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+      .drawer-echo-label {
+        font-size: 7px; letter-spacing: 1.5px;
+        color: var(--dim); text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      .drawer-echo-text {
+        font-size: 11px; line-height: 1.75;
+        color: var(--dim); font-style: italic;
+        border-left: 2px solid var(--dim2);
+        padding-left: 10px;
+      }
+      .drawer-echo-empty { font-size: 10px; color: var(--dim2); font-style: italic; }
+
+      /* ── ask section — dead input at bottom ── */
+      .drawer-ask {
+        padding: 14px 16px;
+        display: flex; flex-direction: column;
+        gap: 8px; flex: 1;
+      }
+      .drawer-ask-label {
+        font-size: 7px; letter-spacing: 1.5px;
+        color: var(--dim2); text-transform: uppercase;
+      }
+      .drawer-input {
+        width: 100%;
+        background: var(--bg2);
+        border: 1px solid rgba(255,255,255,0.04);
+        border-radius: 8px; padding: 10px;
+        font-family: var(--mono); font-size: 12px;
+        color: var(--dim); opacity: 0.35;
+        resize: none; min-height: 90px; flex: 1;
+        pointer-events: none; user-select: none;
+        cursor: default;
+      }
+
+      /* drawer actions */
+      .drawer-actions {
+        display: flex; gap: 8px;
+        padding: 10px 16px 0;
+        flex-shrink: 0;
+        border-top: 1px solid var(--border);
+      }
+      .drawer-btn {
+        flex: 1; padding: 8px 12px; border-radius: 6px;
+        font-family: var(--mono); font-size: 9px; letter-spacing: 1px;
+        cursor: pointer; transition: all 0.15s; border: none;
+      }
+      .drawer-cancel {
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: var(--dim);
+      }
+      .drawer-cancel:hover { background: rgba(255,255,255,0.08); }
+      .drawer-submit {
+        background: rgba(167,139,250,0.04);
+        border: 1px solid rgba(167,139,250,0.1);
+        color: var(--dim);
+        opacity: 0.4;
+        pointer-events: none;
+        cursor: default;
+      }
+
+      /* TANGLED VISUAL: dynamic left border matching voltage */
+      .app.drawer-open.v-life .right-drawer { border-left-color: rgba(125,249,194,0.3); }
+      .app.drawer-open.v-upset .right-drawer { border-left-color: rgba(255,107,107,0.3); }
+      .app.drawer-open.v-task .right-drawer { border-left-color: rgba(255,179,71,0.25); }
+    </style>
+  </head>
+  <body>
+    <div class="app" id="app">
+
+      <!-- MAIN VIEW -->
+      <div class="main-view">
+        <nav class="topnav">
+          <div class="nav-avatar"><div class="nav-avatar-inner"></div></div>
+          <div class="nav-info">
+            <div class="nav-name">ECHO CHAMBER</div>
+            <div class="nav-sub" id="nav-sub">···</div>
+          </div>
+          <div class="nav-actions">
+            <button class="nav-btn" id="filter-toggle" title="filter">⊹</button>
+          </div>
+        </nav>
+
+        <div class="filter-wrap" id="filter-wrap">
+          <div class="filter-bar">
+            <button class="chip a-all" data-f="all">all</button>
+            <button class="chip" data-f="life">● important+</button>
+            <button class="chip" data-f="upset">● important−</button>
+            <button class="chip" data-f="task">● task</button>
+            <button class="chip" data-f="null">● raw</button>
+            <button class="chip" data-f="mobile">mobile</button>
+            <button class="chip" data-f="computer">computer</button>
+          </div>
+        </div>
+
+        <div class="chat" id="chat">
+          <div id="loading">reading your echoes ···</div>
+          <div id="error"></div>
+        </div>
+
+        <div class="input-bar">
+          <div class="input-pill">capture via HTTP Shortcuts ···</div>
+          <div class="send-btn">↑</div>
+        </div>
+      </div>
+
+      <!-- RIGHT DRAWER (MOBILE FULL-SCREEN) -->
+      <div class="right-drawer" id="right-drawer">
+        <div class="drawer-header">
+          <div class="drawer-thought-title" id="drawer-thought-title">—</div>
+          <button class="drawer-close" id="drawer-close">✕</button>
+        </div>
+
+        <div class="drawer-meta-grid" id="drawer-meta-grid">
+          <div class="dm-col"><span class="dm-label">voltage</span><span class="dm-value" id="dm-voltage">—</span></div>
+          <div class="dm-col"><span class="dm-label">confidence</span><span class="dm-value" id="dm-confidence">—</span></div>
+          <div class="dm-col"><span class="dm-label">time</span><span class="dm-value" id="dm-time">—</span></div>
+          <div class="dm-col"><span class="dm-label">source</span><span class="dm-value" id="dm-source">—</span></div>
+        </div>
+
+        <div class="drawer-body">
+          <div class="drawer-echo">
+            <div class="drawer-echo-label">echo</div>
+            <div class="drawer-echo-text" id="drawer-echo-text">—</div>
+          </div>
+
+          <div class="drawer-ask">
+            <div class="drawer-ask-label">note</div>
+            <textarea class="drawer-input" id="drawer-input" placeholder="(read-only)"></textarea>
+          </div>
+        </div>
+
+        <div class="drawer-actions">
+          <button class="drawer-btn drawer-cancel" id="drawer-cancel">cancel</button>
+          <button class="drawer-btn drawer-submit" id="drawer-submit">submit</button>
+        </div>
+      </div>
+
+    </div>
+
+    <script>
+      const app = document.getElementById('app');
+      const chat = document.getElementById('chat');
+      const rightDrawer = document.getElementById('right-drawer');
+      const drawerClose = document.getElementById('drawer-close');
+      const filterToggle = document.getElementById('filter-toggle');
+      const filterWrap = document.getElementById('filter-wrap');
+
+      // Mock data for demo
+      const mockThoughts = [
+        {
+          id: 1,
+          text: 'I keep cancelling things I actually want to do',
+          timestamp: '2026-03-12 16:11Z',
+          voltage: 'upset',
+          confidence: 0.91,
+          source: 'app',
+          device: 'mobile',
+          ai_read: 'The erosion is in the gap between wanting and doing. That gap has a shape. This is the third time it has appeared this week.'
+        },
+        {
+          id: 2,
+          text: 'something is shifting and I can\'t quite name it yet',
+          timestamp: '2026-03-12 16:11Z',
+          voltage: 'life',
+          confidence: 0.87,
+          source: 'app',
+          device: 'computer',
+          ai_read: 'A threshold moment. The substrate is changing but you don\'t have language for it yet. This is where insight lives.'
+        },
+        {
+          id: 3,
+          text: 'sigue esto funcionando?',
+          timestamp: '2026-03-12 19:22Z',
+          voltage: 'task',
+          confidence: 0.65,
+          source: 'app',
+          device: 'computer',
+          ai_read: 'A small check-in. Status inquiry. The question itself contains acceptance.'
+        }
+      ];
+
+      let currentThoughtId = null;
+
+      // Render chat
+      function renderChat() {
+        let html = '';
+        mockThoughts.forEach((thought, idx) => {
+          if (idx > 0 && thought.timestamp !== mockThoughts[idx - 1].timestamp) {
+            html += `<div class="date-sep">${thought.timestamp.split(' ')[0]}</div>`;
+          }
+          const voltageClass = `v-${thought.voltage}`;
+          const stateClass = `st-${thought.voltage}`;
+          html += `
+            <div class="msg visible new-group">
+              <div class="bubble ${voltageClass}" data-id="${thought.id}" onclick="openDrawer(event, ${thought.id})">
+                <div class="bubble-txt">${thought.text}</div>
+                <div class="bubble-echo">${thought.ai_read}</div>
+                <div class="bubble-ask-link">ask about this ›</div>
+                <div class="bubble-foot">
+                  <span class="b-time">${thought.timestamp.split(' ')[1]}</span>
+                  <span class="b-state ${stateClass}">${thought.voltage.toUpperCase()}</span>
+                  <span style="color: var(--dim); font-size: 9px; margin-left: auto;">${thought.source}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        chat.innerHTML = html;
+      }
+
+      // Open drawer
+      function openDrawer(event, thoughtId) {
+        const thought = mockThoughts.find(t => t.id === thoughtId);
+        if (!thought) return;
+
+        currentThoughtId = thoughtId;
+        const voltageClass = `v-${thought.voltage}`;
+
+        // Set voltage class on app for tangled border color
+        app.classList.remove('v-life', 'v-upset', 'v-task');
+        app.classList.add(voltageClass);
+        app.classList.add('drawer-open');
+
+        // Populate drawer
+        document.getElementById('drawer-thought-title').textContent = thought.text;
+        document.getElementById('dm-voltage').textContent = thought.voltage.toUpperCase();
+        document.getElementById('dm-voltage').className = `dm-value st-${thought.voltage}`;
+        document.getElementById('dm-confidence').textContent = thought.confidence.toFixed(2);
+        document.getElementById('dm-time').textContent = thought.timestamp.split(' ')[1];
+        document.getElementById('dm-source').textContent = thought.source;
+        document.getElementById('drawer-echo-text').textContent = thought.ai_read;
+        document.getElementById('drawer-input').value = '';
+      }
+
+      // Close drawer
+      function closeDrawer() {
+        app.classList.remove('drawer-open', 'v-life', 'v-upset', 'v-task');
+        currentThoughtId = null;
+      }
+
+      drawerClose.addEventListener('click', closeDrawer);
+
+      // Filter toggle
+      filterToggle.addEventListener('click', () => {
+        filterWrap.classList.toggle('open');
+      });
+
+      // Render on load
+      renderChat();
+    </script>
+  </body>
+</html>
