@@ -54,8 +54,20 @@
 ════════════════════════════════ */
       .app {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         height: 100dvh;
+      }
+
+      .main-view {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .app.drawer-open .main-view {
+        transform: translateX(-320px);
       }
 
       /* ════════════════════════════════
@@ -432,7 +444,7 @@
         opacity: 0;
       }
       .bubble.expanded .bubble-detail {
-        max-height: 160px;
+        max-height: 400px;
         opacity: 1;
       }
 
@@ -467,47 +479,247 @@
       .bd-val.st-life  { color: var(--life);  opacity: 1; }
       .bd-val.st-upset { color: var(--upset); opacity: 1; }
       .bd-val.st-poke  { color: var(--poke);  opacity: 1; }
+
+      /* ── ai read summary ── */
+      .bd-ai-read {
+        font-size: 10px;
+        line-height: 1.6;
+        color: var(--dim);
+        font-style: italic;
+        opacity: 0.75;
+        margin-top: 8px;
+        padding: 0 6px;
+      }
+
+      /* ── inquiry button ── */
+      .bd-inquiry {
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .inquiry-btn {
+        display: block;
+        width: 100%;
+        background: transparent;
+        border: 1px solid rgba(167, 139, 250, 0.25);
+        border-radius: 8px;
+        padding: 6px 8px;
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 1px;
+        color: var(--purple);
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .inquiry-btn:hover {
+        background: rgba(167, 139, 250, 0.08);
+        border-color: rgba(167, 139, 250, 0.4);
+      }
+      .inquiry-btn:active {
+        background: rgba(167, 139, 250, 0.12);
+      }
+
+      /* ════════════════════════════════
+   RIGHT DRAWER (INQUIRY PANEL)
+════════════════════════════════ */
+      .right-drawer {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 320px;
+        height: 100dvh;
+        background: var(--bg);
+        border-left: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        padding: calc(var(--safe-t) + 10px) 16px calc(var(--safe-b) + 10px);
+        transform: translateX(320px);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 999;
+      }
+
+      .app.drawer-open .right-drawer {
+        transform: translateX(0);
+      }
+
+      .drawer-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+        flex-shrink: 0;
+      }
+
+      .drawer-title {
+        font-family: var(--disp);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        color: #fff;
+      }
+
+      .drawer-close {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--dim);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+
+      .drawer-close:hover {
+        color: var(--text);
+        border-color: rgba(255, 255, 255, 0.1);
+      }
+
+      .drawer-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        overflow-y: auto;
+      }
+
+      .drawer-hint {
+        font-size: 9px;
+        letter-spacing: 0.8px;
+        color: var(--dim);
+      }
+
+      .drawer-input {
+        width: 100%;
+        background: var(--bg2);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 8px;
+        padding: 10px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+        resize: vertical;
+        min-height: 100px;
+        flex-grow: 1;
+        transition: border-color 0.15s;
+      }
+
+      .drawer-input:focus {
+        outline: none;
+        border-color: rgba(167, 139, 250, 0.3);
+        background: rgba(167, 139, 250, 0.02);
+      }
+
+      .drawer-actions {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+
+      .drawer-btn {
+        flex: 1;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.15s;
+        border: none;
+      }
+
+      .drawer-cancel {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--dim);
+      }
+
+      .drawer-cancel:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .drawer-submit {
+        background: rgba(167, 139, 250, 0.12);
+        border: 1px solid rgba(167, 139, 250, 0.3);
+        color: var(--purple);
+      }
+
+      .drawer-submit:hover {
+        background: rgba(167, 139, 250, 0.18);
+      }
+
+      .drawer-submit:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
     </style>
   </head>
   <body>
-    <div class="app">
-      <!-- TOP NAV -->
-      <nav class="topnav">
-        <div class="nav-avatar">
-          <div class="nav-avatar-inner"></div>
-        </div>
-        <div class="nav-info">
-          <div class="nav-name">ECHO CHAMBER</div>
-          <div class="nav-sub" id="nav-sub">···</div>
-        </div>
-        <div class="nav-actions">
-          <button class="nav-btn" id="filter-toggle" title="filter">⊹</button>
-        </div>
-      </nav>
+    <div class="app" id="app">
+      <!-- MAIN VIEW -->
+      <div class="main-view">
+        <!-- TOP NAV -->
+        <nav class="topnav">
+          <div class="nav-avatar">
+            <div class="nav-avatar-inner"></div>
+          </div>
+          <div class="nav-info">
+            <div class="nav-name">ECHO CHAMBER</div>
+            <div class="nav-sub" id="nav-sub">···</div>
+          </div>
+          <div class="nav-actions">
+            <button class="nav-btn" id="filter-toggle" title="filter">⊹</button>
+          </div>
+        </nav>
 
-      <!-- FILTER BAR (collapsible) -->
-      <div class="filter-wrap" id="filter-wrap">
-        <div class="filter-bar">
-          <button class="chip a-all" data-f="all">all</button>
-          <button class="chip" data-f="life">● important+</button>
-          <button class="chip" data-f="upset">● important−</button>
-          <button class="chip" data-f="task">● task</button>
-          <button class="chip" data-f="null">● raw</button>
-          <button class="chip" data-f="mobile">mobile</button>
-          <button class="chip" data-f="computer">computer</button>
+        <!-- FILTER BAR (collapsible) -->
+        <div class="filter-wrap" id="filter-wrap">
+          <div class="filter-bar">
+            <button class="chip a-all" data-f="all">all</button>
+            <button class="chip" data-f="life">● important+</button>
+            <button class="chip" data-f="upset">● important−</button>
+            <button class="chip" data-f="task">● task</button>
+            <button class="chip" data-f="null">● raw</button>
+            <button class="chip" data-f="mobile">mobile</button>
+            <button class="chip" data-f="computer">computer</button>
+          </div>
+        </div>
+
+        <!-- CHAT -->
+        <div class="chat" id="chat">
+          <div id="loading">reading your echoes ···</div>
+          <div id="error"></div>
+        </div>
+
+        <!-- INPUT BAR -->
+        <div class="input-bar">
+          <div class="input-pill">capture via HTTP Shortcuts ···</div>
+          <div class="send-btn">↑</div>
         </div>
       </div>
 
-      <!-- CHAT -->
-      <div class="chat" id="chat">
-        <div id="loading">reading your echoes ···</div>
-        <div id="error"></div>
-      </div>
-
-      <!-- INPUT BAR -->
-      <div class="input-bar">
-        <div class="input-pill">capture via HTTP Shortcuts ···</div>
-        <div class="send-btn">↑</div>
+      <!-- RIGHT DRAWER -->
+      <div class="right-drawer" id="right-drawer">
+        <div class="drawer-header">
+          <div class="drawer-title">ask about this ></div>
+          <button class="drawer-close" id="drawer-close">✕</button>
+        </div>
+        <div class="drawer-content">
+          <div class="drawer-hint">What would you like to know?</div>
+          <textarea
+            class="drawer-input"
+            id="drawer-input"
+            placeholder="Your question..."
+            maxlength="500"
+          ></textarea>
+        </div>
+        <div class="drawer-actions">
+          <button class="drawer-btn drawer-cancel" id="drawer-cancel">cancel</button>
+          <button class="drawer-btn drawer-submit" id="drawer-submit">submit</button>
+        </div>
       </div>
     </div>
 
@@ -519,7 +731,8 @@
       );
 
       let all = [],
-        activeF = "all";
+        activeF = "all",
+        currentInquiryThoughtId = null;
 
       /* ── helpers ── */
       function vc(s) {
@@ -561,6 +774,64 @@
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;");
       }
+
+      /* ── drawer handlers ── */
+      function openDrawer(thoughtId) {
+        currentInquiryThoughtId = thoughtId;
+        document.getElementById("drawer-input").value = "";
+        document.getElementById("app").classList.add("drawer-open");
+        document.getElementById("drawer-input").focus();
+      }
+
+      function closeDrawer() {
+        document.getElementById("app").classList.remove("drawer-open");
+        currentInquiryThoughtId = null;
+      }
+
+      async function submitInquiry() {
+        const question = document.getElementById("drawer-input").value.trim();
+        if (!question) return;
+        if (!currentInquiryThoughtId) return;
+
+        const btn = document.getElementById("drawer-submit");
+        btn.disabled = true;
+        btn.textContent = "sending...";
+
+        try {
+          const { data, error } = await db
+            .from("inquiries")
+            .insert([
+              {
+                thought_id: currentInquiryThoughtId,
+                user_question: question,
+              },
+            ])
+            .select();
+
+          if (error) {
+            console.error("Inquiry insert failed:", error);
+            alert(`Error: ${error.message}`);
+            return;
+          }
+
+          console.log("Inquiry submitted:", data);
+          alert("✓ Inquiry recorded. KW will respond on next scan (~4h).");
+          closeDrawer();
+        } catch (e) {
+          console.error("Inquiry failed:", e);
+          alert("Error submitting inquiry. Check console.");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "submit";
+        }
+      }
+
+      document.getElementById("drawer-close").addEventListener("click", closeDrawer);
+      document.getElementById("drawer-cancel").addEventListener("click", closeDrawer);
+      document.getElementById("drawer-submit").addEventListener("click", submitInquiry);
+      document.getElementById("drawer-input").addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && e.ctrlKey) submitInquiry();
+      });
 
       /* ── render ── */
       function render(thoughts) {
@@ -604,17 +875,21 @@
             : "—";
 
           const detailRows = [
-            ["time",   fullTs,               ""],
-            ["state",  vLabel || "—",        vLabel ? "st-" + v : ""],
-            ["source", t.state_source || "—",""],
-            ["device", t.device || "—",      ""],
-            ["input",  t.input_type || "—",  ""],
+            ["time",   fullTs,                 ""],
+            ["state",  vLabel || "—",          vLabel ? "st-" + v : ""],
+            ["confidence", t.confidence !== null ? (t.confidence * 100).toFixed(0) + '%' : '—', ""],
+            ["source", t.state_source || "—",  ""],
+            ["device", t.device || "—",        ""],
           ].map(([k, val, cls]) =>
             `<div class="bd-row">
               <span class="bd-key">${k}</span>
               <span class="bd-val ${cls}">${esc(val)}</span>
             </div>`
           ).join("");
+
+          const aiReadHtml = t.ai_read
+            ? `<div class="bd-ai-read">${esc(t.ai_read)}</div>`
+            : "";
 
           msg.innerHTML = `
       <div class="bubble">
@@ -625,13 +900,25 @@
           ${t.device ? `<span class="b-dev">${esc(t.device)}</span>` : ""}
         </div>
         <div class="bubble-detail">
-          <div class="bubble-detail-inner">${detailRows}</div>
+          <div class="bubble-detail-inner">
+            ${detailRows}
+            ${aiReadHtml}
+            <div class="bd-inquiry">
+              <button class="inquiry-btn" data-thought-id="${t.id}">ask about this ></button>
+            </div>
+          </div>
         </div>
       </div>`;
 
           msg.querySelector(".bubble").addEventListener("click", function () {
             this.classList.toggle("expanded");
           });
+
+          msg.querySelector(".inquiry-btn").addEventListener("click", (e) => {
+            e.stopPropagation();
+            openDrawer(e.target.dataset.thoughtId);
+          });
+
           chat.appendChild(msg);
           setTimeout(() => msg.classList.add("visible"), 10 + i * 15);
         });
@@ -685,7 +972,7 @@
         const { data, error } = await db
           .from("thoughts")
           .select(
-            "id,content,created_at,trinary_state,state_source,device,input_type",
+            "id,content,created_at,trinary_state,state_source,device,input_type,ai_read,confidence",
           )
           .order("created_at", { ascending: false })
           .limit(150);

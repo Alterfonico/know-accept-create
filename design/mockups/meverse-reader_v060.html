@@ -432,7 +432,7 @@
         opacity: 0;
       }
       .bubble.expanded .bubble-detail {
-        max-height: 160px;
+        max-height: 200px;
         opacity: 1;
       }
 
@@ -467,6 +467,141 @@
       .bd-val.st-life  { color: var(--life);  opacity: 1; }
       .bd-val.st-upset { color: var(--upset); opacity: 1; }
       .bd-val.st-poke  { color: var(--poke);  opacity: 1; }
+
+      /* ── ai read summary ── */
+      .bd-ai-read {
+        font-size: 10px;
+        line-height: 1.5;
+        color: var(--dim);
+        font-style: italic;
+        opacity: 0.7;
+        margin-top: 6px;
+        padding: 0 6px;
+      }
+
+      /* ── inquiry button ── */
+      .bd-inquiry {
+        margin-top: 6px;
+        padding-top: 6px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .inquiry-btn {
+        display: block;
+        width: 100%;
+        background: transparent;
+        border: 1px solid rgba(125, 249, 194, 0.2);
+        border-radius: 8px;
+        padding: 6px 8px;
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 1px;
+        color: var(--life);
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .inquiry-btn:hover {
+        background: rgba(125, 249, 194, 0.08);
+        border-color: rgba(125, 249, 194, 0.35);
+      }
+      .inquiry-btn:active {
+        background: rgba(125, 249, 194, 0.12);
+      }
+
+      /* ── inquiry modal (hidden by default) ── */
+      .inquiry-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+      .inquiry-modal.open {
+        display: flex;
+      }
+      .inquiry-modal-content {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      }
+      .inquiry-modal-title {
+        font-family: var(--disp);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: #fff;
+        margin-bottom: 10px;
+      }
+      .inquiry-modal-hint {
+        font-size: 9px;
+        letter-spacing: 0.8px;
+        color: var(--dim);
+        margin-bottom: 10px;
+      }
+      .inquiry-input {
+        width: 100%;
+        background: var(--bg2);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 8px;
+        padding: 10px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+        resize: vertical;
+        min-height: 60px;
+        margin-bottom: 10px;
+        transition: border-color 0.15s;
+      }
+      .inquiry-input:focus {
+        outline: none;
+        border-color: rgba(125, 249, 194, 0.3);
+        background: rgba(125, 249, 194, 0.02);
+      }
+      .inquiry-actions {
+        display: flex;
+        gap: 8px;
+      }
+      .inquiry-cancel,
+      .inquiry-submit {
+        flex: 1;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.15s;
+        border: none;
+      }
+      .inquiry-cancel {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--dim);
+      }
+      .inquiry-cancel:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .inquiry-submit {
+        background: rgba(125, 249, 194, 0.12);
+        border: 1px solid rgba(125, 249, 194, 0.3);
+        color: var(--life);
+      }
+      .inquiry-submit:hover {
+        background: rgba(125, 249, 194, 0.18);
+      }
+      .inquiry-submit:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
     </style>
   </head>
   <body>
@@ -511,6 +646,24 @@
       </div>
     </div>
 
+    <!-- INQUIRY MODAL (hidden until triggered) -->
+    <div class="inquiry-modal" id="inquiry-modal">
+      <div class="inquiry-modal-content">
+        <div class="inquiry-modal-title">ask about this ></div>
+        <div class="inquiry-modal-hint">What would you like to know?</div>
+        <textarea
+          class="inquiry-input"
+          id="inquiry-input"
+          placeholder="Your question..."
+          maxlength="500"
+        ></textarea>
+        <div class="inquiry-actions">
+          <button class="inquiry-cancel" id="inquiry-cancel">cancel</button>
+          <button class="inquiry-submit" id="inquiry-submit">submit</button>
+        </div>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script>
       const db = supabase.createClient(
@@ -519,7 +672,8 @@
       );
 
       let all = [],
-        activeF = "all";
+        activeF = "all",
+        currentInquiryThoughtId = null;
 
       /* ── helpers ── */
       function vc(s) {
@@ -561,6 +715,66 @@
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;");
       }
+
+      /* ── inquiry modal handlers ── */
+      function openInquiry(thoughtId) {
+        currentInquiryThoughtId = thoughtId;
+        document.getElementById("inquiry-input").value = "";
+        document.getElementById("inquiry-modal").classList.add("open");
+        document.getElementById("inquiry-input").focus();
+      }
+
+      function closeInquiry() {
+        document.getElementById("inquiry-modal").classList.remove("open");
+        currentInquiryThoughtId = null;
+      }
+
+      async function submitInquiry() {
+        const question = document.getElementById("inquiry-input").value.trim();
+        if (!question) return;
+        if (!currentInquiryThoughtId) return;
+
+        const btn = document.getElementById("inquiry-submit");
+        btn.disabled = true;
+        btn.textContent = "sending...";
+
+        try {
+          const { data, error } = await db
+            .from("inquiries")
+            .insert([
+              {
+                thought_id: currentInquiryThoughtId,
+                user_question: question,
+              },
+            ])
+            .select();
+
+          if (error) {
+            console.error("Inquiry insert failed:", error);
+            alert(`Error: ${error.message}`);
+            return;
+          }
+
+          console.log("Inquiry submitted:", data);
+          alert("✓ Inquiry recorded. KW will respond on next scan (~4h).");
+          closeInquiry();
+        } catch (e) {
+          console.error("Inquiry failed:", e);
+          alert("Error submitting inquiry. Check console.");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "submit";
+        }
+      }
+
+      document.getElementById("inquiry-cancel").addEventListener("click", closeInquiry);
+      document.getElementById("inquiry-submit").addEventListener("click", submitInquiry);
+      document.getElementById("inquiry-input").addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && e.ctrlKey) submitInquiry();
+      });
+      document.getElementById("inquiry-modal").addEventListener("click", (e) => {
+        if (e.target === document.getElementById("inquiry-modal")) closeInquiry();
+      });
 
       /* ── render ── */
       function render(thoughts) {
@@ -606,15 +820,16 @@
           const detailRows = [
             ["time",   fullTs,               ""],
             ["state",  vLabel || "—",        vLabel ? "st-" + v : ""],
-            ["source", t.state_source || "—",""],
-            ["device", t.device || "—",      ""],
-            ["input",  t.input_type || "—",  ""],
           ].map(([k, val, cls]) =>
             `<div class="bd-row">
               <span class="bd-key">${k}</span>
               <span class="bd-val ${cls}">${esc(val)}</span>
             </div>`
           ).join("");
+
+          const aiReadHtml = t.ai_read
+            ? `<div class="bd-ai-read">${esc(t.ai_read)}</div>`
+            : "";
 
           msg.innerHTML = `
       <div class="bubble">
@@ -625,13 +840,25 @@
           ${t.device ? `<span class="b-dev">${esc(t.device)}</span>` : ""}
         </div>
         <div class="bubble-detail">
-          <div class="bubble-detail-inner">${detailRows}</div>
+          <div class="bubble-detail-inner">
+            ${detailRows}
+            ${aiReadHtml}
+            <div class="bd-inquiry">
+              <button class="inquiry-btn" data-thought-id="${t.id}">ask about this ></button>
+            </div>
+          </div>
         </div>
       </div>`;
 
           msg.querySelector(".bubble").addEventListener("click", function () {
             this.classList.toggle("expanded");
           });
+
+          msg.querySelector(".inquiry-btn").addEventListener("click", (e) => {
+            e.stopPropagation();
+            openInquiry(e.target.dataset.thoughtId);
+          });
+
           chat.appendChild(msg);
           setTimeout(() => msg.classList.add("visible"), 10 + i * 15);
         });
@@ -685,7 +912,7 @@
         const { data, error } = await db
           .from("thoughts")
           .select(
-            "id,content,created_at,trinary_state,state_source,device,input_type",
+            "id,content,created_at,trinary_state,state_source,device,input_type,ai_read",
           )
           .order("created_at", { ascending: false })
           .limit(150);
