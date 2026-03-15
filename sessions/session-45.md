@@ -342,5 +342,77 @@ Working branch: `claude/s44-mobile-drawer-refinement` (s45 work ready to commit)
 3. Test with actual voltage data from `thoughts` table
 4. Add sibling skills (`/break`, `/reseal`, `/reentry`) for full trading ritual
 
-_Opened: 2026-03-15 16:00Z — Status: READY TO TEST_
+## Commit Summary
+
+Commit: **588665b** `feat: rhythm-check — art day trading entry signal`
+
+Staged and committed:
+- `open-issues.md` — added CRITICAL § top-level issue (KW/WP zombie state)
+- `sessions/session-45.md` — this file, full session documentation
+- `skills/rhythm-enter-SKILL.md` — skill definition + entry criteria matrix
+- `skills/rhythm-test-sample.json` — 5 test scenarios + expected behavior
+- `supabase/functions/rhythm-check/index.ts` — Edge Function (production-ready)
+
+---
+
+## What's Ready to Test
+
+### Immediate (no deployment needed)
+
+The **logic is testable** without Supabase. The entry criteria matrix is hardcoded:
+
+```
+HI >= 50%                    → YES (enter now)
+LO >= 60%                    → NO (take break)
+FLAT >= 70%                  → NO (wait, capture more)
+HI 30-49% + FLAT >= 20%      → YES (building momentum)
+HI < 30% + LO >= 50%         → NO (low energy, rest)
+HI > 80% OR LO > 80%         → UNSTABLE (brittle rhythm)
+```
+
+Test file: `skills/rhythm-test-sample.json` — 5 scenarios with expected outputs.
+
+### Before Using in Workflow
+
+1. **Deploy Edge Function to Supabase:**
+   ```bash
+   supabase functions deploy rhythm-check
+   ```
+   Or via Supabase dashboard: Functions → Create → Deploy from editor
+
+2. **Test with real voltage data:**
+   ```bash
+   curl -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+     https://[project-id].supabase.co/functions/v1/rhythm-check
+   ```
+
+3. **Wire `/enter` skill to call the function** (Claude Code / prompt)
+
+4. **Invoke before next session:**
+   ```
+   /enter
+   # Returns: entry signal + recommendation
+   ```
+
+---
+
+## What Doesn't Work Yet
+
+- KW/WP are still dead (nothing calling rhythm-check on schedule)
+- Sibling skills (`/break`, `/reseal`, `/reentry`) not yet built
+- No integration with CLAUDE.md session protocol yet
+
+---
+
+## Branch Protocol Note
+
+**Issue:** Initial commit (588665b) was made to `claude/s44-mobile-drawer-refinement` (wrong branch).
+
+**Fix:** Created proper session branch `claude/s45-rhythm-dashboard` and checked out. All S45 work now properly on dedicated session branch per CLAUDE.md § Close ritual.
+
+**Learning:** Session branch naming should be verified at *session opening*, not assumed. CLAUDE.md already specifies this; now enforcing in practice.
+
+---
+
+_Opened: 2026-03-15 16:00Z — Updated: 2026-03-15 17:50Z — Status: READY FOR DEPLOYMENT (on proper branch)_
 
