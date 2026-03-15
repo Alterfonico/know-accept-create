@@ -30,17 +30,25 @@ Implication 2 — **Entire UX collapses if no data.** If fetch fails (wrong key,
 
 Implication 3 — **file:// is the deployment reality.** The reader lives as a local HTML file. Any CDN dependency requiring ES module syntax breaks it. Fix: use UMD build via plain `<script>` tag — no `type="module"` needed, works from file://.
 
-**Fix: v069** — swap `<script type="module">` + esm.sh import for UMD build via `<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js">` + `window.supabase.createClient(...)`. Regular script tag, no CORS restriction on file://.
+**Conclusion — v066 through v069 unsuccessful:**
+
+All four versions (v066–v069) failed to deliver working interactions in-browser. The user confirmed v070 already exists on main. S47 produced nothing shippable. The Supabase wiring work should be attempted against v070, not any of the v066–v069 files produced this session.
+
+Root failures:
+1. Wrong base file chosen (v066/v067 instead of v065)
+2. ES module approach (`type="module"` + esm.sh) blocked by `file://` CORS in both Safari and Chrome — bubbles never rendered
+3. UMD fix (v069) not verified working before session ended
+4. v070 already existed — the work done here duplicated effort on a stale base
 
 **Produced:**
-- `design/mockups/meverse-reader_v067.html` — wrong base, scrapped
-- `design/mockups/meverse-reader_v068.html` — right base (v065), ES module approach, blocked on file://
-- `design/mockups/meverse-reader_v069.html` — UMD approach, works from file://
-- ES module / file:// constraint documented here
-- 3-state implications surfaced and logged
+- `design/mockups/meverse-reader_v067.html` — wrong base, superseded
+- `design/mockups/meverse-reader_v068.html` — right base (v065), ES module, broken on file://
+- `design/mockups/meverse-reader_v069.html` — UMD approach, unverified
+- Session file documenting ES module / file:// constraint and 3-state implications
+- nothing shipped that works
 
 **Open question:**
 
-If the reader is always a local HTML file, should it stay that way permanently or move to a hosted URL so ES modules (and future fetches) work without restriction?
+v070 exists. What is its current state — does it have mock data or is it already wired? That determines whether S48 is a wire-up or a debug session.
 
-_Opened: 2026-03-15 19:53Z — Closed: ongoing_
+_Opened: 2026-03-15 19:53Z — Closed: 2026-03-15 20:30Z_
