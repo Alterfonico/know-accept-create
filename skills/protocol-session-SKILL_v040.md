@@ -1,10 +1,9 @@
 ---
-name: protocol-session
+name: open
 description: >
-  Session protocol for the Meverse / know-accept-create project.
-  Invoked with /open, /enter, /break, or /seal commands.
-  Use /open at the START of every session. Use /enter before starting work to check rhythm.
-  Use /break when depleted. Use /seal to close session cleanly.
+  Session opener for the Meverse / know-accept-create project.
+  Invoked with /open N topic — creates dedicated session branch, reads handoff, calibrates timestamp.
+  Also describes /enter (rhythm check), /break (burnout detection), /seal (session close).
   Trigger on any mention of "session", "open", "enter", "seal", "break", "INDEX",
   "parking", "PARKED", or "close the loop".
   This skill defines how Claude behaves as a collaborator in this project.

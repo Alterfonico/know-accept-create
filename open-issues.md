@@ -14,9 +14,20 @@ Known open issues. Not blockers. Logged so they cannot hide.
 
 - [ ] **WP DEAD (41h):** Last audit 2026-03-13 12:07Z. Correctly detected KW_SILENT but wrote to `kw-meta-audit.md` asking for human review. No restart action taken. WP also stopped running (no Cycle 3 since 2026-03-13).
 
-- [ ] **Action:** Build lightweight rhythm-tracker independent of KW (Path B). Query voltage trend directly from `thoughts` table (last 12h), expose as `/enter` signal. Then decide whether to resurrect KW separately for pipeline monitoring.
+- [x] **Path B Built (S45):** Lightweight rhythm-tracker built independent of KW. Edge Function `rhythm-check` queries voltage trend directly from `thoughts` table (last 12h), applies entry criteria matrix.
 
-**Why this matters:** User wants "art day trading" signals (when to enter/break/reseal sessions). Rhythm data exists in Supabase but KW can't access it. Need direct query → `/enter` command to unblock.
+**S45 Deliverables (Ready for S46 deployment):**
+- [ ] **Deploy `/enter` skill:** `supabase functions deploy rhythm-check` to activate the entry signal
+  - Edge Function: `supabase/functions/rhythm-check/index.ts` (production-ready, needs deploy)
+  - Skill definition: `skills/rhythm-enter-SKILL.md` (ready to invoke)
+  - Test cases: `skills/rhythm-test-sample.json` (logic validated)
+  - Entry criteria: HI≥50%→YES, LO≥60%→NO, FLAT≥70%→NO, building momentum, brittle rhythm
+
+- [ ] **Wire `/open` command:** `protocol-session-SKILL_v040.md` configured to be invokable as `/open N topic`
+  - Executes: timestamp calibration → read handoff → create session branch → ready to work
+  - Status: Skill file ready, waiting for Claude Code skill system to recognize v040
+
+**Why this matters:** User wants "art day trading" signals (when to enter/break/reseal sessions). Rhythm data exists in Supabase but KW can't access it. S45 built the path; S46 deploys it.
 
 ---
 
