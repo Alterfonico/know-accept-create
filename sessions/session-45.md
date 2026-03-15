@@ -1,6 +1,13 @@
 # Session 45 — 2026-03-15 16:00Z
 ## Rhythm Dashboard: Art Day Trading for Claude Code Sessions
 
+**Opening Ritual (16:00Z):**
+1. ✓ Calibrated timestamp: `date -u` → 2026-03-15 16:00:13Z
+2. ✓ Read S44 handoff (mobile drawer refinement pending)
+3. ✓ Verified branches: s44 sealed, naughty-grothendieck stale, interesting-black outdated
+4. ✓ Created session branch: `git checkout -b claude/s45-rhythm-dashboard`
+5. ✓ Proceeded with work
+
 **State on arrival:** S44 sealed with PR #3 merged. Mobile drawer refinement (v065) ready for continuation. Two stale worktrees + untracked vision files (meta-architectural research) pending. Main repo on s44 branch with uncommitted KW monitoring data.
 
 **Initial assessment (16:00Z):**
@@ -412,7 +419,46 @@ Test file: `skills/rhythm-test-sample.json` — 5 scenarios with expected output
 
 **Learning:** Session branch naming should be verified at *session opening*, not assumed. CLAUDE.md already specifies this; now enforcing in practice.
 
+### Branch Creation Protocol (For S46+)
+
+**At session opening, before any work:**
+
+```bash
+# 1. Verify session number & topic
+SESSION_NUM=46
+SESSION_TOPIC="your-topic-here"
+
+# 2. Create dedicated session branch (from main or previous session)
+git checkout -b claude/s${SESSION_NUM}-${SESSION_TOPIC}
+
+# 3. Verify
+git branch -v
+git log --oneline -1
+
+# 4. Proceed with work on this branch
+```
+
+**At session close:**
+- All work committed to session branch
+- Branch ready for PR
+- INDEX.md updated
+- Session file documented
+
 ---
 
-_Opened: 2026-03-15 16:00Z — Updated: 2026-03-15 17:50Z — Status: READY FOR DEPLOYMENT (on proper branch)_
+**Session 45 Summary:**
+
+| Item | Value |
+|------|-------|
+| Session Number | 45 |
+| Session Title | Rhythm Dashboard: Art Day Trading for Claude Code Sessions |
+| Branch | `claude/s45-rhythm-dashboard` |
+| Opened | 2026-03-15 16:00Z |
+| Updated | 2026-03-15 16:48Z |
+| Status | READY FOR DEPLOYMENT (on proper branch) |
+| Commits | 588665b (rhythm-check), d8aa790 (branch fix) |
+
+---
+
+_Opened: 2026-03-15 16:00Z — Closed: 2026-03-15 16:48Z — Duration: 48 minutes_
 
