@@ -45,6 +45,7 @@ A chronological narrative of each session. A witnessed record of how the system 
 41. Mar 13 — Cloud observer stack — KW/WP as Edge Functions, always-running, independent of local state
 42. Mar 13 — Reader bubbles — expanded panel with ai_read and ask-about-this wired, v062 canonical
 43. Mar 14 — Tangled drawer — v065 dark-mode mobile reader, three-state bubble, push layout fixed
+44. Mar 15 — Branch calibration + S43 merge — protocol clarified, conflicts resolved, S44 ready
 
 ---
 
