@@ -46,6 +46,9 @@ A chronological narrative of each session. A witnessed record of how the system 
 42. Mar 13 — Reader bubbles — expanded panel with ai_read and ask-about-this wired, v062 canonical
 43. Mar 14 — Tangled drawer — v065 dark-mode mobile reader, three-state bubble, push layout fixed
 44. Mar 15 — Branch calibration + S43 merge — protocol clarified, conflicts resolved, S44 ready
+45. Mar 15 — Rhythm dashboard — session entry/exit signals, art-day-trading decision framework
+46. Mar 15 — Mobile drawer v066 — width refined (280px/72%), redundant text resolved
+47. Mar 15 — S45/S46 reconstruction + PR workflow confirmed + S47 readiness (reader deployment)
 
 ---
 
