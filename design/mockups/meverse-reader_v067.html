@@ -435,7 +435,7 @@
           <div class="dm-col"><span class="dm-label">voltage</span><span class="dm-value" id="dm-voltage">—</span></div>
           <div class="dm-col"><span class="dm-label">confidence</span><span class="dm-value" id="dm-confidence">—</span></div>
           <div class="dm-col"><span class="dm-label">time</span><span class="dm-value" id="dm-time">—</span></div>
-          <div class="dm-col"><span class="dm-label">source</span><span class="dm-value" id="dm-source">—</span></div>
+          <div class="dm-col"><span class="dm-label">type</span><span class="dm-value" id="dm-source">—</span></div>
         </div>
 
         <div class="drawer-body">
@@ -458,138 +458,211 @@
 
     </div>
 
-    <script>
-      const app = document.getElementById('app');
-      const chat = document.getElementById('chat');
-      const rightDrawer = document.getElementById('right-drawer');
+    <script type="module">
+      import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+      const SUPABASE_URL  = 'https://nlfryozynimffhwkhhls.supabase.co';
+      const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sZnJ5b3p5bmltZmZod2toaGxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTExMDAsImV4cCI6MjA4ODEyNzEwMH0.VWLopIlZi7ad6MNA84LEo7ztiWBylzJ6g5Y1jHav1zw';
+
+      const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+      const app         = document.getElementById('app');
+      const chatEl      = document.getElementById('chat');
+      const loadingEl   = document.getElementById('loading');
+      const errorEl     = document.getElementById('error');
       const drawerClose = document.getElementById('drawer-close');
       const filterToggle = document.getElementById('filter-toggle');
-      const filterWrap = document.getElementById('filter-wrap');
+      const filterWrap   = document.getElementById('filter-wrap');
 
-      // Mock data for demo
-      const mockThoughts = [
-        {
-          id: 1,
-          text: 'I keep cancelling things I actually want to do',
-          timestamp: '2026-03-12 16:11Z',
-          voltage: 'upset',
-          confidence: 0.91,
-          source: 'app',
-          device: 'mobile',
-          ai_read: 'The erosion is in the gap between wanting and doing. That gap has a shape. This is the third time it has appeared this week.'
-        },
-        {
-          id: 2,
-          text: 'something is shifting and I can\'t quite name it yet',
-          timestamp: '2026-03-12 16:11Z',
-          voltage: 'life',
-          confidence: 0.87,
-          source: 'app',
-          device: 'computer',
-          ai_read: 'A threshold moment. The substrate is changing but you don\'t have language for it yet. This is where insight lives.'
-        },
-        {
-          id: 3,
-          text: 'sigue esto funcionando?',
-          timestamp: '2026-03-12 19:22Z',
-          voltage: 'task',
-          confidence: 0.65,
-          source: 'app',
-          device: 'computer',
-          ai_read: 'A small check-in. Status inquiry. The question itself contains acceptance.'
+      let allThoughts    = [];
+      let activeFilter   = 'all';
+      let currentId      = null;
+
+      /* ── helpers ── */
+      function voltageFrom(state) {
+        if (state === 1) return 'life';
+        if (state === 2) return 'upset';
+        if (state === 0) return 'task';
+        return 'none';
+      }
+
+      const stateLabel = { life: 'HI', upset: 'LO', task: 'TASK', none: 'RAW' };
+
+      function fmtDate(iso) { return iso ? iso.slice(0, 10) : '—'; }
+
+      function fmtTime(iso) {
+        if (!iso) return '—';
+        const d = new Date(iso);
+        return String(d.getUTCHours()).padStart(2,'0') + ':' +
+               String(d.getUTCMinutes()).padStart(2,'0') + 'Z';
+      }
+
+      function esc(str) {
+        return String(str || '')
+          .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      }
+
+      /* ── fetch ── */
+      async function fetchThoughts() {
+        const { data, error } = await sb
+          .from('thoughts')
+          .select('id, content, created_at, trinary_state, confidence, device, input_type, ai_read')
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        loadingEl.style.display = 'none';
+
+        if (error) {
+          errorEl.style.display = 'block';
+          errorEl.textContent = 'fetch error: ' + error.message;
+          return;
         }
-      ];
 
-      let currentThoughtId = null;
+        allThoughts = data || [];
+        const n = allThoughts.length;
+        document.getElementById('nav-sub').textContent = n + ' echo' + (n !== 1 ? 's' : '');
+        render();
+      }
 
-      // Render chat
-      function renderChat() {
+      /* ── filter ── */
+      function filtered() {
+        if (activeFilter === 'all')      return allThoughts;
+        if (activeFilter === 'life')     return allThoughts.filter(t => t.trinary_state === 1);
+        if (activeFilter === 'upset')    return allThoughts.filter(t => t.trinary_state === 2);
+        if (activeFilter === 'task')     return allThoughts.filter(t => t.trinary_state === 0);
+        if (activeFilter === 'null')     return allThoughts.filter(t => t.trinary_state == null);
+        if (activeFilter === 'mobile')   return allThoughts.filter(t => t.device === 'mobile');
+        if (activeFilter === 'computer') return allThoughts.filter(t => t.device === 'computer');
+        return allThoughts;
+      }
+
+      /* ── render ── */
+      function render() {
+        const thoughts = filtered();
+
+        if (!thoughts.length) {
+          chatEl.innerHTML = '<div style="align-self:center;margin:auto;font-size:10px;letter-spacing:2px;color:var(--dim)">no echoes ···</div>';
+          return;
+        }
+
         let html = '';
-        mockThoughts.forEach((thought, idx) => {
-          if (idx > 0 && thought.timestamp !== mockThoughts[idx - 1].timestamp) {
-            html += `<div class="date-sep">${thought.timestamp.split(' ')[0]}</div>`;
-          }
-          const voltageClass = `v-${thought.voltage}`;
-          const stateClass = `st-${thought.voltage}`;
-          html += `
-            <div class="msg visible new-group">
-              <div class="bubble ${voltageClass}" data-id="${thought.id}">
-                <div class="bubble-txt">${thought.text}</div>
-                <div class="bubble-echo">${thought.ai_read}</div>
-                <div class="bubble-ask-link">ask about this ›</div>
-                <div class="bubble-foot">
-                  <span class="b-time">${thought.timestamp.split(' ')[1]}</span>
-                  <span class="b-state ${stateClass}">${thought.voltage.toUpperCase()}</span>
-                  <span style="color: var(--dim); font-size: 9px; margin-left: auto;">${thought.source}</span>
-                </div>
-              </div>
-            </div>
-          `;
-        });
-        chat.innerHTML = html;
+        let lastDate = null;
 
-        // Wire semi-expand + ask-link per bubble
-        document.querySelectorAll('.bubble').forEach(bubble => {
-          const id = parseInt(bubble.dataset.id);
+        thoughts.forEach(t => {
+          const date = fmtDate(t.created_at);
+          if (date !== lastDate) {
+            html += '<div class="date-sep">' + date + '</div>';
+            lastDate = date;
+          }
+
+          const v   = voltageFrom(t.trinary_state);
+          const lbl = stateLabel[v];
+          const conf = t.confidence != null ? Number(t.confidence).toFixed(2) : '—';
+          const hasEcho = !!t.ai_read;
+
+          html += '<div class="msg visible new-group">' +
+            '<div class="bubble v-' + v + '" data-id="' + t.id + '">' +
+              '<div class="bubble-txt">' + esc(t.content) + '</div>' +
+              (hasEcho ? '<div class="bubble-echo">' + esc(t.ai_read) + '</div>' : '') +
+              (hasEcho ? '<div class="bubble-ask-link">ask about this ›</div>' : '') +
+              '<div class="bubble-foot">' +
+                '<span class="b-time">' + fmtTime(t.created_at) + '</span>' +
+                '<span class="b-state st-' + v + '">' + lbl + '</span>' +
+                '<span style="color:var(--dim);font-size:9px;margin-left:auto">' + esc(t.input_type || '') + '</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        });
+
+        chatEl.innerHTML = html;
+        chatEl.scrollTop = chatEl.scrollHeight;
+        wire(thoughts);
+      }
+
+      /* ── wire interactions ── */
+      function wire(thoughts) {
+        chatEl.querySelectorAll('.bubble').forEach(bubble => {
+          const id = bubble.dataset.id;
           const askLink = bubble.querySelector('.bubble-ask-link');
 
-          bubble.addEventListener('click', function(e) {
+          bubble.addEventListener('click', e => {
             if (askLink && askLink.contains(e.target)) return;
-            // Collapse any other expanded bubble
-            document.querySelectorAll('.bubble.expanded').forEach(b => {
+            chatEl.querySelectorAll('.bubble.expanded').forEach(b => {
               if (b !== bubble) b.classList.remove('expanded');
             });
             bubble.classList.toggle('expanded');
           });
 
           if (askLink) {
-            askLink.addEventListener('click', function(e) {
+            askLink.addEventListener('click', e => {
               e.stopPropagation();
-              openDrawer(id);
+              openDrawer(id, thoughts);
             });
           }
         });
       }
 
-      // Open drawer
-      function openDrawer(thoughtId) {
-        const thought = mockThoughts.find(t => t.id === thoughtId);
-        if (!thought) return;
+      /* ── drawer ── */
+      function openDrawer(thoughtId, thoughts) {
+        const t = thoughts.find(x => x.id === thoughtId);
+        if (!t) return;
+        currentId = thoughtId;
 
-        currentThoughtId = thoughtId;
-        const voltageClass = `v-${thought.voltage}`;
+        const v   = voltageFrom(t.trinary_state);
+        const lbl = stateLabel[v];
+        const conf = t.confidence != null ? Number(t.confidence).toFixed(2) : '—';
 
-        // Set voltage class on app for tangled border color
-        app.classList.remove('v-life', 'v-upset', 'v-task');
-        app.classList.add(voltageClass);
-        app.classList.add('drawer-open');
+        app.classList.remove('v-life','v-upset','v-task','v-none');
+        app.classList.add('v-' + v, 'drawer-open');
 
-        // Populate drawer
-        document.getElementById('drawer-thought-title').textContent = thought.text;
-        document.getElementById('dm-voltage').textContent = thought.voltage.toUpperCase();
-        document.getElementById('dm-voltage').className = `dm-value st-${thought.voltage}`;
-        document.getElementById('dm-confidence').textContent = thought.confidence.toFixed(2);
-        document.getElementById('dm-time').textContent = thought.timestamp.split(' ')[1];
-        document.getElementById('dm-source').textContent = thought.source;
-        document.getElementById('drawer-echo-text').textContent = thought.ai_read;
+        document.getElementById('drawer-thought-title').textContent = t.content || '';
+        const dmV = document.getElementById('dm-voltage');
+        dmV.textContent = lbl;
+        dmV.className = 'dm-value st-' + v;
+        document.getElementById('dm-confidence').textContent = conf;
+        document.getElementById('dm-time').textContent = fmtTime(t.created_at);
+        document.getElementById('dm-source').textContent = t.input_type || '—';
+
+        const echoEl = document.getElementById('drawer-echo-text');
+        if (t.ai_read) {
+          echoEl.textContent = t.ai_read;
+          echoEl.className = 'drawer-echo-text';
+        } else {
+          echoEl.textContent = 'not yet read';
+          echoEl.className = 'drawer-echo-text drawer-echo-empty';
+        }
+
         document.getElementById('drawer-input').value = '';
       }
 
-      // Close drawer
       function closeDrawer() {
-        app.classList.remove('drawer-open', 'v-life', 'v-upset', 'v-task');
-        currentThoughtId = null;
+        app.classList.remove('drawer-open','v-life','v-upset','v-task','v-none');
+        currentId = null;
       }
 
-      drawerClose.addEventListener('click', closeDrawer);
+      /* ── filter chips ── */
+      const chipActiveClass = { all:'a-all', life:'a-life', upset:'a-up', task:'a-task', null:'a-all', mobile:'a-mob', computer:'a-mob' };
 
-      // Filter toggle
-      filterToggle.addEventListener('click', () => {
-        filterWrap.classList.toggle('open');
+      document.querySelectorAll('.chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          activeFilter = chip.dataset.f;
+          document.querySelectorAll('.chip').forEach(c => {
+            c.className = 'chip';
+            if (c.dataset.f === activeFilter && chipActiveClass[activeFilter]) {
+              c.classList.add(chipActiveClass[activeFilter]);
+            }
+          });
+          render();
+        });
       });
 
-      // Render on load
-      renderChat();
+      /* ── event listeners ── */
+      drawerClose.addEventListener('click', closeDrawer);
+      document.getElementById('drawer-cancel').addEventListener('click', closeDrawer);
+      filterToggle.addEventListener('click', () => filterWrap.classList.toggle('open'));
+
+      /* ── init ── */
+      fetchThoughts();
     </script>
   </body>
 </html>

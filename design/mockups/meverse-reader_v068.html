@@ -458,69 +458,60 @@
 
     </div>
 
-    <script>
+    <script type="module">
+      import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+      const SUPABASE_URL = 'https://nlfryozynimffhwkhhls.supabase.co';
+      const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sZnJ5b3p5bmltZmZod2toaGxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTExMDAsImV4cCI6MjA4ODEyNzEwMH0.VWLopIlZi7ad6MNA84LEo7ztiWBylzJ6g5Y1jHav1zw';
+      const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
       const app = document.getElementById('app');
       const chat = document.getElementById('chat');
-      const rightDrawer = document.getElementById('right-drawer');
       const drawerClose = document.getElementById('drawer-close');
       const filterToggle = document.getElementById('filter-toggle');
       const filterWrap = document.getElementById('filter-wrap');
 
-      // Mock data for demo
-      const mockThoughts = [
-        {
-          id: 1,
-          text: 'I keep cancelling things I actually want to do',
-          timestamp: '2026-03-12 16:11Z',
-          voltage: 'upset',
-          confidence: 0.91,
-          source: 'app',
-          device: 'mobile',
-          ai_read: 'The erosion is in the gap between wanting and doing. That gap has a shape. This is the third time it has appeared this week.'
-        },
-        {
-          id: 2,
-          text: 'something is shifting and I can\'t quite name it yet',
-          timestamp: '2026-03-12 16:11Z',
-          voltage: 'life',
-          confidence: 0.87,
-          source: 'app',
-          device: 'computer',
-          ai_read: 'A threshold moment. The substrate is changing but you don\'t have language for it yet. This is where insight lives.'
-        },
-        {
-          id: 3,
-          text: 'sigue esto funcionando?',
-          timestamp: '2026-03-12 19:22Z',
-          voltage: 'task',
-          confidence: 0.65,
-          source: 'app',
-          device: 'computer',
-          ai_read: 'A small check-in. Status inquiry. The question itself contains acceptance.'
-        }
-      ];
-
+      let thoughts = [];
       let currentThoughtId = null;
+
+      // Map trinary_state integer to voltage string
+      function voltageFrom(state) {
+        if (state === 1) return 'life';
+        if (state === 2) return 'upset';
+        if (state === 0) return 'task';
+        return 'none';
+      }
+
+      function fmtDate(iso) { return iso ? iso.slice(0, 10) : '—'; }
+      function fmtTime(iso) {
+        if (!iso) return '—';
+        const d = new Date(iso);
+        return String(d.getUTCHours()).padStart(2,'0') + ':' + String(d.getUTCMinutes()).padStart(2,'0') + 'Z';
+      }
 
       // Render chat
       function renderChat() {
         let html = '';
-        mockThoughts.forEach((thought, idx) => {
-          if (idx > 0 && thought.timestamp !== mockThoughts[idx - 1].timestamp) {
-            html += `<div class="date-sep">${thought.timestamp.split(' ')[0]}</div>`;
+        thoughts.forEach((thought, idx) => {
+          const date = fmtDate(thought.created_at);
+          const prevDate = idx > 0 ? fmtDate(thoughts[idx - 1].created_at) : null;
+          if (idx === 0 || date !== prevDate) {
+            html += `<div class="date-sep">${date}</div>`;
           }
-          const voltageClass = `v-${thought.voltage}`;
-          const stateClass = `st-${thought.voltage}`;
+          const voltage = voltageFrom(thought.trinary_state);
+          const voltageClass = `v-${voltage}`;
+          const stateClass = `st-${voltage}`;
+          const stateLabel = { life: 'HI', upset: 'LO', task: 'TASK', none: 'RAW' }[voltage];
           html += `
             <div class="msg visible new-group">
               <div class="bubble ${voltageClass}" data-id="${thought.id}">
-                <div class="bubble-txt">${thought.text}</div>
-                <div class="bubble-echo">${thought.ai_read}</div>
-                <div class="bubble-ask-link">ask about this ›</div>
+                <div class="bubble-txt">${thought.content}</div>
+                ${thought.ai_read ? `<div class="bubble-echo">${thought.ai_read}</div>` : ''}
+                ${thought.ai_read ? `<div class="bubble-ask-link">ask about this ›</div>` : ''}
                 <div class="bubble-foot">
-                  <span class="b-time">${thought.timestamp.split(' ')[1]}</span>
-                  <span class="b-state ${stateClass}">${thought.voltage.toUpperCase()}</span>
-                  <span style="color: var(--dim); font-size: 9px; margin-left: auto;">${thought.source}</span>
+                  <span class="b-time">${fmtTime(thought.created_at)}</span>
+                  <span class="b-state ${stateClass}">${stateLabel}</span>
+                  <span style="color: var(--dim); font-size: 9px; margin-left: auto;">${thought.input_type || ''}</span>
                 </div>
               </div>
             </div>
@@ -530,7 +521,7 @@
 
         // Wire semi-expand + ask-link per bubble
         document.querySelectorAll('.bubble').forEach(bubble => {
-          const id = parseInt(bubble.dataset.id);
+          const id = bubble.dataset.id;
           const askLink = bubble.querySelector('.bubble-ask-link');
 
           bubble.addEventListener('click', function(e) {
@@ -553,25 +544,26 @@
 
       // Open drawer
       function openDrawer(thoughtId) {
-        const thought = mockThoughts.find(t => t.id === thoughtId);
+        const thought = thoughts.find(t => t.id === thoughtId);
         if (!thought) return;
 
         currentThoughtId = thoughtId;
-        const voltageClass = `v-${thought.voltage}`;
+        const voltage = voltageFrom(thought.trinary_state);
+        const stateLabel = { life: 'HI', upset: 'LO', task: 'TASK', none: 'RAW' }[voltage];
 
         // Set voltage class on app for tangled border color
         app.classList.remove('v-life', 'v-upset', 'v-task');
-        app.classList.add(voltageClass);
+        app.classList.add(`v-${voltage}`);
         app.classList.add('drawer-open');
 
         // Populate drawer
-        document.getElementById('drawer-thought-title').textContent = thought.text;
-        document.getElementById('dm-voltage').textContent = thought.voltage.toUpperCase();
-        document.getElementById('dm-voltage').className = `dm-value st-${thought.voltage}`;
-        document.getElementById('dm-confidence').textContent = thought.confidence.toFixed(2);
-        document.getElementById('dm-time').textContent = thought.timestamp.split(' ')[1];
-        document.getElementById('dm-source').textContent = thought.source;
-        document.getElementById('drawer-echo-text').textContent = thought.ai_read;
+        document.getElementById('drawer-thought-title').textContent = thought.content;
+        document.getElementById('dm-voltage').textContent = stateLabel;
+        document.getElementById('dm-voltage').className = `dm-value st-${voltage}`;
+        document.getElementById('dm-confidence').textContent = thought.confidence != null ? Number(thought.confidence).toFixed(2) : '—';
+        document.getElementById('dm-time').textContent = fmtTime(thought.created_at);
+        document.getElementById('dm-source').textContent = thought.input_type || '—';
+        document.getElementById('drawer-echo-text').textContent = thought.ai_read || '—';
         document.getElementById('drawer-input').value = '';
       }
 
@@ -588,8 +580,29 @@
         filterWrap.classList.toggle('open');
       });
 
-      // Render on load
-      renderChat();
+      // Fetch from Supabase and render
+      async function fetchThoughts() {
+        const { data, error } = await sb
+          .from('thoughts')
+          .select('id, content, created_at, trinary_state, confidence, device, input_type, ai_read')
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        document.getElementById('loading').style.display = 'none';
+
+        if (error) {
+          const errEl = document.getElementById('error');
+          errEl.style.display = 'block';
+          errEl.textContent = 'fetch error: ' + error.message;
+          return;
+        }
+
+        thoughts = data || [];
+        document.getElementById('nav-sub').textContent = thoughts.length + ' echoes';
+        renderChat();
+      }
+
+      fetchThoughts();
     </script>
   </body>
 </html>
