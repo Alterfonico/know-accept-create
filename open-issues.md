@@ -216,3 +216,9 @@ Everything else follows the roadmap.
 - **Evidence:** `kw-supabase-config.json` not present on disk (gitignored, not restored). Cannot call Supabase REST API. Pipeline state unknown.
 - **Rows affected:** 0/20 — scan not possible
 - **Note:** KW_SILENT condition continues. Last successful scan: 2026-03-11 19:02Z (~93h ago, ~23 missed cycles). WP flagged KW_SILENT in Cycle 1 and Cycle 2. Previous TOOL_UNAVAILABLE logged 2026-03-13 16:10Z. Config restore required to resume monitoring.
+
+### [2026-03-15 00:00Z] Friction: N/A
+- **Type:** TOOL_UNAVAILABLE
+- **Evidence:** `kw-supabase-config.json` not present on disk (gitignored, not restored). Cannot call Supabase REST API. Pipeline state unknown.
+- **Rows affected:** 0/20 — scan not possible
+- **Note:** KW_SILENT condition persists. Last successful scan: 2026-03-11 19:02Z (~96h ago, ~24 missed cycles). TOOL_UNAVAILABLE logged on 2026-03-13 and 2026-03-14 as well. Config restore required to resume monitoring.
