@@ -1,8 +1,22 @@
 # open-issues.md
 
-**Last updated:** 2026-03-12
+**Last updated:** 2026-03-15
 
 Known open issues. Not blockers. Logged so they cannot hide.
+
+---
+
+## CRITICAL: Observation Stack Failure (S45)
+
+**Status:** ACTIVE. KW & WP are in zombie state, producing no useful signal.
+
+- [ ] **KW DEAD (104h):** Last successful scan 2026-03-11 19:02Z. Scheduled task running but failing: `kw-supabase-config.json` gitignored, not restored. KW writes "TOOL_UNAVAILABLE" every 4h instead of reading `thoughts` table. Data is useless spam.
+
+- [ ] **WP DEAD (41h):** Last audit 2026-03-13 12:07Z. Correctly detected KW_SILENT but wrote to `kw-meta-audit.md` asking for human review. No restart action taken. WP also stopped running (no Cycle 3 since 2026-03-13).
+
+- [ ] **Action:** Build lightweight rhythm-tracker independent of KW (Path B). Query voltage trend directly from `thoughts` table (last 12h), expose as `/enter` signal. Then decide whether to resurrect KW separately for pipeline monitoring.
+
+**Why this matters:** User wants "art day trading" signals (when to enter/break/reseal sessions). Rhythm data exists in Supabase but KW can't access it. Need direct query → `/enter` command to unblock.
 
 ---
 
@@ -222,3 +236,9 @@ Everything else follows the roadmap.
 - **Evidence:** `kw-supabase-config.json` not present on disk (gitignored, not restored). Cannot call Supabase REST API. Pipeline state unknown.
 - **Rows affected:** 0/20 — scan not possible
 - **Note:** KW_SILENT condition persists. Last successful scan: 2026-03-11 19:02Z (~96h ago, ~24 missed cycles). TOOL_UNAVAILABLE logged on 2026-03-13 and 2026-03-14 as well. Config restore required to resume monitoring.
+
+### [2026-03-15 16:10Z] Friction: N/A
+- **Type:** TOOL_UNAVAILABLE
+- **Evidence:** `kw-supabase-config.json` not present on disk (gitignored, not restored). Cannot call Supabase REST API. Pipeline state unknown.
+- **Rows affected:** 0/20 — scan not possible
+- **Note:** KW_SILENT condition persists. Last successful scan: 2026-03-11 19:02Z (~117h ago, ~29 missed cycles). TOOL_UNAVAILABLE logged continuously since 2026-03-13. Config restore required to resume monitoring.
