@@ -63,3 +63,40 @@ Per S43 handoff, two refinements pending:
 - `ai_read` generation pipeline location
 - Backfill strategy for null `ai_read` nodes
 - design/visions/zone-b-main/ audit
+
+---
+
+## Session Close Protocol — Refined (S44+)
+
+### Standard Seal Answer Format
+
+Always use this structure when closing sessions:
+
+```
+✓ [Status table with branches cleaned/preserved]
+[PR summary with link]
+[Handoff status]
+Ready to [next action]
+```
+
+Clean, scannable, actionable. Apply every session.
+
+### Permission Prompts — Critical Only
+
+Reduce explicit approval asks to **critical operations only**:
+
+**Require explicit permission:**
+- Downloading files from untrusted sources
+- Entering sensitive data (financial, passwords, credentials, API keys)
+- Permanent deletions
+- Modifying sharing/permissions on documents
+- Sending messages on user's behalf
+
+**No permission needed** (expected collaborator autonomy):
+- Creating PRs / pushing branches
+- Committing code to session branch
+- File operations within the repo
+- Merging/rebasing (within session workflow)
+- Opening issues / updating INDEX.md
+
+This boundary is implicit protocol. Apply starting S45.
