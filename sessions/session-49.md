@@ -18,4 +18,20 @@ Assessed documentation confidence at 5/10 — need to close one SD/SM loop end-t
 **Open question:**
 Can we get >6/10 confidence to document the meta-case-study by fixing one of: cron checkpoint, KW health, or SM audit cycle?
 
-_Opened: 2026-03-16 22:19Z — Closed: 2026-03-16 22:XXZ_
+---
+
+## Handoff → Session 50
+
+**Primary thread:** Continue meta-case-study narrative OR fix stale worktrees
+
+**What to do on arrival:**
+1. Read this file + session-48.md
+2. Check PR #7 status
+3. Review PARKing items from S49:
+   - Stale worktrees (frosty-grothendieck, s47) — violate branch deletion invariant
+   - Cron never fired — debug or accept manual checkpoints
+   - Classifier failure — 17/20 rows null trinary_state
+
+**The gold in our chat is what gets documented.**
+
+_Opened: 2026-03-16 22:19Z — Closed: 2026-03-16 23:15Z_
