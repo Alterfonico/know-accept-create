@@ -14,6 +14,12 @@ Assessed documentation confidence at 5/10 — need to close one SD/SM loop end-t
 **Produced:**
 - /tmp/meverse-session-49.log — checkpoint buffer for S49
 - sessions/session-49.md — this file (first SD/SM loop closed manually, API key unavailable)
+- `/sync` atomic subcommand design — light micro-commands:
+  - `/sync time` — `date -u` (timestamp)
+  - `/sync prior` — read previous session handoff
+  - `/sync branch` — `git status` + branch check
+  - `/sync flow` — verify INDEX.md continuity
+  Each is sub-100ms. User composes what they need. Nothing runs "just because."
 
 **Open question:**
 Can we get >6/10 confidence to document the meta-case-study by fixing one of: cron checkpoint, KW health, or SM audit cycle?
