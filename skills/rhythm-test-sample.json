@@ -1,0 +1,59 @@
+{
+  "test_cases": [
+    {
+      "name": "Ready to Enter",
+      "raw_data": [
+        { "trinary_state": 1, "count": 15 },
+        { "trinary_state": 2, "count": 6 },
+        { "trinary_state": 0, "count": 3 }
+      ],
+      "total": 24,
+      "expected_signal": "YES",
+      "reasoning": "HI 62.5% >= 50% → enter"
+    },
+    {
+      "name": "Take a Break",
+      "raw_data": [
+        { "trinary_state": 1, "count": 5 },
+        { "trinary_state": 2, "count": 16 },
+        { "trinary_state": 0, "count": 3 }
+      ],
+      "total": 24,
+      "expected_signal": "NO",
+      "reasoning": "LO 66.7% >= 60% → break"
+    },
+    {
+      "name": "Building Momentum",
+      "raw_data": [
+        { "trinary_state": 1, "count": 8 },
+        { "trinary_state": 2, "count": 8 },
+        { "trinary_state": 0, "count": 8 }
+      ],
+      "total": 24,
+      "expected_signal": "YES",
+      "reasoning": "HI 33.3% (30-49%) + FLAT 33.3% (>=20%) → building momentum"
+    },
+    {
+      "name": "No Clear Signal",
+      "raw_data": [
+        { "trinary_state": 1, "count": 2 },
+        { "trinary_state": 2, "count": 3 },
+        { "trinary_state": 0, "count": 19 }
+      ],
+      "total": 24,
+      "expected_signal": "NO",
+      "reasoning": "FLAT 79.2% >= 70% → wait, capture more"
+    },
+    {
+      "name": "Brittle: All HI",
+      "raw_data": [
+        { "trinary_state": 1, "count": 22 },
+        { "trinary_state": 2, "count": 1 },
+        { "trinary_state": 0, "count": 1 }
+      ],
+      "total": 24,
+      "expected_signal": "UNSTABLE",
+      "reasoning": "HI 91.7% > 80% → brittle, no diversity"
+    }
+  ]
+}
