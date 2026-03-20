@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+    <title>Echo Chamber · v082</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;1,300&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+    <!-- Supabase in <head> so it is parsed before any script in <body> runs -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <style>
+      :root {
+        --bg: #07070d;
+        --bg2: #0d0d18;
+        --bg3: #111122;
+        --life: #7df9c2;
+        --upset: #ff6b6b;
+        --poke: #ffb347;
+        --purple: #a78bfa;
+        --text: #d0d0d8;
+        --dim: #484860;
+        --dim2: #2e2e45;
+        --border: rgba(255,255,255,0.05);
+        --bubble: #12121e;
+        --mono: "IBM Plex Mono", monospace;
+        --disp: "Syne", sans-serif;
+        --safe-t: env(safe-area-inset-top, 0px);
+        --safe-b: env(safe-area-inset-bottom, 0px);
+      }
+
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      html, body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--mono);
+        height: 100dvh;
+        overflow: hidden;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body { overflow-x: hidden; }
+
+      .app {
+        display: flex; flex-direction: row;
+        width: calc(100vw + 280px); height: 100dvh;
+        transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      }
+      .app.drawer-open { transform: translateX(-280px); }
+
+      .main-view {
+        width: 100vw; flex-shrink: 0;
+        display: flex; flex-direction: column;
+      }
+
+      /* ── top nav ── */
+      .topnav {
+        flex-shrink: 0; background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        padding: calc(var(--safe-t) + 10px) 16px 10px;
+        display: flex; align-items: center; gap: 12px;
+      }
+      .nav-avatar {
+        width: 36px; height: 36px; border-radius: 50%;
+        background: var(--bg3); border: 1px solid rgba(125,249,194,0.15);
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      }
+      .nav-avatar-inner {
+        width: 10px; height: 10px; border-radius: 50%;
+        background: var(--life); box-shadow: 0 0 8px var(--life);
+        animation: breathe 2.8s ease-in-out infinite;
+      }
+      @keyframes breathe {
+        0%,100% { opacity: 0.4; transform: scale(1); }
+        50%      { opacity: 1;   transform: scale(1.3); }
+      }
+      .nav-info { flex: 1; min-width: 0; }
+      .nav-name {
+        font-family: var(--disp); font-size: 15px; font-weight: 800;
+        color: #fff; letter-spacing: 3px; line-height: 1.2;
+      }
+      .nav-sub { font-size: 9px; letter-spacing: 1.5px; color: var(--dim); margin-top: 1px; }
+      .nav-actions { display: flex; gap: 6px; align-items: center; }
+      .nav-btn {
+        width: 32px; height: 32px; border-radius: 50%;
+        background: transparent; border: 1px solid var(--border); color: var(--dim);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14px; cursor: pointer; transition: all 0.15s;
+      }
+      .nav-btn:active { background: var(--bg2); color: var(--text); }
+
+      /* ── filter ── */
+      .filter-wrap {
+        flex-shrink: 0; overflow: hidden; max-height: 0;
+        transition: max-height 0.3s cubic-bezier(0.16,1,0.3,1);
+        background: var(--bg); border-bottom: 1px solid transparent;
+      }
+      .filter-wrap.open { max-height: 50px; border-bottom-color: var(--border); }
+      .filter-bar { display: flex; gap: 6px; padding: 9px 16px; overflow-x: auto; scrollbar-width: none; }
+      .filter-bar::-webkit-scrollbar { display: none; }
+      .chip {
+        flex-shrink: 0; padding: 4px 11px; border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.07); background: transparent; color: var(--dim);
+        font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px;
+        cursor: pointer; transition: all 0.15s;
+      }
+      .chip.a-all  { border-color: rgba(255,255,255,0.2);  color: var(--text); }
+      .chip.a-life { border-color: rgba(125,249,194,0.4);  color: var(--life);   background: rgba(125,249,194,0.05); }
+      .chip.a-up   { border-color: rgba(255,107,107,0.4);  color: var(--upset);  background: rgba(255,107,107,0.05); }
+      .chip.a-task { border-color: rgba(255,179,71,0.4);   color: var(--poke);   background: rgba(255,179,71,0.05);  }
+      .chip.a-mob  { border-color: rgba(167,139,250,0.4);  color: var(--purple); background: rgba(167,139,250,0.05); }
+
+      /* ── chat ── */
+      .chat {
+        flex: 1; overflow-y: auto; overflow-x: hidden;
+        padding: 12px 14px 8px;
+        display: flex; flex-direction: column; gap: 2px;
+        scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
+      }
+      .date-sep {
+        align-self: center; font-size: 9px; letter-spacing: 1.8px; color: var(--dim);
+        background: var(--bg2); border: 1px solid var(--border);
+        border-radius: 20px; padding: 3px 10px; margin: 10px 0 4px; text-transform: lowercase;
+      }
+      .msg {
+        display: flex; justify-content: flex-end; padding: 0 2px;
+        opacity: 0; transform: translateY(8px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+      }
+      .msg.visible   { opacity: 1; transform: none; }
+      .msg.new-group { margin-top: 8px; }
+
+      /* ── empty state ── */
+      .empty-state {
+        align-self: center; margin: auto;
+        font-size: 10px; letter-spacing: 2px; color: var(--dim2);
+        font-style: italic;
+      }
+
+      /* ── bubble ── */
+      .bubble {
+        max-width: 100%; background: var(--bubble);
+        border-radius: 16px 16px 3px 16px; padding: 9px 12px 7px;
+        border: 1px solid rgba(255,255,255,0.04);
+        position: relative; overflow: hidden; cursor: pointer; transition: border-color 0.15s;
+      }
+      .bubble:hover { border-color: rgba(255,255,255,0.09); }
+      .bubble::after {
+        content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+      }
+      .v-life  .bubble::after { background: var(--life);  box-shadow: 2px 0 8px rgba(125,249,194,0.3); }
+      .v-upset .bubble::after { background: var(--upset); box-shadow: 2px 0 8px rgba(255,107,107,0.3); }
+      .v-task  .bubble::after { background: var(--poke);  box-shadow: 2px 0 6px rgba(255,179,71,0.25); }
+      .v-none  .bubble::after { background: transparent; }
+
+      /* active-held: greyscale lift only, no colour */
+      .bubble.active-held {
+        background: rgba(255,255,255,0.04);
+        border-color: rgba(255,255,255,0.25);
+      }
+
+      .bubble-txt {
+        font-size: 14px; line-height: 1.7; color: var(--text);
+        padding-left: 6px; word-break: break-word;
+      }
+
+      /* echo preview: 1-line truncated, shown when expanded */
+      .bubble-echo-preview {
+        display: none;
+        font-size: 10px; line-height: 1.5;
+        color: var(--dim); font-style: italic;
+        padding: 5px 6px 0; margin-top: 4px;
+        border-top: 1px solid rgba(255,255,255,0.04);
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+      .bubble.expanded .bubble-echo-preview { display: block; }
+
+      .bubble-ask-link {
+        display: none; font-size: 9px; letter-spacing: 0.8px;
+        color: var(--purple); opacity: 0.7;
+        text-align: right; padding: 5px 6px 0; cursor: pointer; transition: opacity 0.15s;
+      }
+      .bubble-ask-link:hover { opacity: 1; }
+      /* only show ask link when expanded AND analysis exists (set via data attr) */
+      .bubble.expanded[data-has-echo="1"] .bubble-ask-link { display: block; }
+
+      .bubble-foot {
+        display: flex; align-items: center; gap: 5px; margin-top: 5px; padding-left: 6px;
+      }
+      .b-time  { font-size: 9px; letter-spacing: 1px; color: var(--dim); }
+      .b-state { font-size: 9px; letter-spacing: 0.5px; }
+      .st-life  { color: var(--life);  }
+      .st-upset { color: var(--upset); }
+      .st-task  { color: var(--poke);  }
+      .st-none  { color: var(--dim);   }
+
+      #loading {
+        align-self: center; margin: auto;
+        font-size: 10px; letter-spacing: 2.5px; color: var(--dim);
+        animation: flicker 1.6s ease-in-out infinite;
+      }
+      @keyframes flicker { 0%,100%{opacity:0.3} 50%{opacity:1} }
+      #error {
+        display: none; align-self: stretch; margin: 16px; padding: 14px; border-radius: 10px;
+        border: 1px solid rgba(255,107,107,0.2); background: rgba(255,107,107,0.04);
+        font-size: 10px; line-height: 1.9; color: var(--upset);
+      }
+
+      /* ── input bar ── */
+      .input-bar {
+        flex-shrink: 0; background: var(--bg); border-top: 1px solid var(--border);
+        padding: 10px 14px calc(var(--safe-b) + 10px);
+        display: flex; align-items: center; gap: 10px;
+      }
+      .input-pill {
+        flex: 1; background: var(--bg2); border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 22px; padding: 11px 16px;
+        font-family: var(--mono); font-size: 13px;
+        color: var(--dim); font-style: italic; letter-spacing: 0.02em;
+        pointer-events: none; user-select: none;
+      }
+      .send-btn {
+        width: 40px; height: 40px; border-radius: 50%;
+        background: rgba(125,249,194,0.08); border: 1px solid rgba(125,249,194,0.2);
+        color: var(--life); display: flex; align-items: center; justify-content: center;
+        font-size: 16px; cursor: pointer; flex-shrink: 0; transition: all 0.15s;
+      }
+      .send-btn:active { background: rgba(125,249,194,0.15); }
+
+      /* ── right drawer ── */
+      .right-drawer {
+        width: 280px; flex-shrink: 0; height: 100dvh;
+        background: var(--bg); display: flex; flex-direction: column;
+        padding: calc(var(--safe-t) + 10px) 0 0;
+        border-left: 3px solid rgba(255,255,255,0.1);
+        overflow: hidden;
+      }
+      .app.drawer-open.v-life  .right-drawer { border-left-color: rgba(125,249,194,0.3); }
+      .app.drawer-open.v-upset .right-drawer { border-left-color: rgba(255,107,107,0.3); }
+      .app.drawer-open.v-task  .right-drawer { border-left-color: rgba(255,179,71,0.25); }
+
+      .drawer-header {
+        display: flex; align-items: flex-start; gap: 10px;
+        padding: 0 16px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+      }
+      .drawer-thought-title {
+        flex: 1; min-width: 0; font-size: 13px; line-height: 1.6;
+        color: var(--text); font-family: var(--mono);
+        /* truncated to 1 line */
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+      .drawer-close {
+        width: 28px; height: 28px; border-radius: 50%;
+        background: transparent; border: 1px solid var(--border); color: var(--dim);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14px; cursor: pointer; transition: all 0.15s;
+        flex-shrink: 0; margin-top: 2px;
+      }
+      .drawer-close:hover { color: var(--text); border-color: rgba(255,255,255,0.1); }
+
+      .drawer-meta-grid {
+        display: grid; grid-template-columns: repeat(4,1fr);
+        padding: 12px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+      }
+      .dm-col { display: flex; flex-direction: column; gap: 5px; }
+      .dm-label { font-size: 7px; letter-spacing: 1.2px; color: var(--dim); text-transform: uppercase; }
+      .dm-value { font-size: 10px; color: var(--text); opacity: 0.8; line-height: 1.2; }
+      .dm-value.st-life  { color: var(--life);  opacity: 1; }
+      .dm-value.st-upset { color: var(--upset); opacity: 1; }
+      .dm-value.st-task  { color: var(--poke);  opacity: 1; }
+
+      .drawer-body { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+
+      .drawer-echo { padding: 14px 16px; flex-shrink: 0; }
+      .drawer-echo-label {
+        font-size: 7px; letter-spacing: 1.5px; color: var(--dim);
+        text-transform: uppercase; margin-bottom: 8px;
+      }
+      .drawer-echo-text {
+        font-size: 11px; line-height: 1.75; color: var(--dim); font-style: italic;
+        border-left: 2px solid var(--dim2); padding-left: 10px;
+      }
+      .drawer-echo-empty {
+        color: var(--dim2); font-style: italic; font-size: 10px; letter-spacing: 0.5px;
+        animation: flicker 2.4s ease-in-out infinite;
+      }
+
+      /* note section hidden — populated by input bar in future session */
+      .drawer-ask { display: none; }
+
+      /* ── drawer bottom: disabled capture pill ── */
+      .drawer-capture {
+        flex-shrink: 0; border-top: 1px solid var(--border);
+        padding: 10px 14px calc(var(--safe-b) + 10px);
+        display: flex; align-items: center; gap: 10px;
+      }
+      .drawer-capture-pill {
+        flex: 1; background: var(--bg2); border: 1px solid rgba(255,255,255,0.04);
+        border-radius: 22px; padding: 11px 16px;
+        font-family: var(--mono); font-size: 12px; color: var(--dim2); font-style: italic;
+        pointer-events: none; user-select: none; opacity: 0.45;
+      }
+      .drawer-capture-btn {
+        width: 40px; height: 40px; border-radius: 50%;
+        background: transparent; border: 1px solid rgba(255,255,255,0.04);
+        color: var(--dim2); display: flex; align-items: center; justify-content: center;
+        font-size: 16px; flex-shrink: 0; opacity: 0.25; pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app" id="app">
+
+      <!-- MAIN VIEW -->
+      <div class="main-view" id="main-view">
+        <nav class="topnav">
+          <div class="nav-avatar"><div class="nav-avatar-inner"></div></div>
+          <div class="nav-info">
+            <div class="nav-name">ECHO CHAMBER</div>
+            <div class="nav-sub" id="nav-sub">···</div>
+          </div>
+          <div class="nav-actions">
+            <button class="nav-btn" id="filter-toggle" title="filter">⊹</button>
+          </div>
+        </nav>
+
+        <div class="filter-wrap" id="filter-wrap">
+          <div class="filter-bar">
+            <button class="chip a-all" data-f="all">all</button>
+            <button class="chip" data-f="life">● life</button>
+            <button class="chip" data-f="upset">● upset</button>
+            <button class="chip" data-f="task">● task</button>
+            <button class="chip" data-f="null">● raw</button>
+            <button class="chip" data-f="mobile">mobile</button>
+            <button class="chip" data-f="computer">computer</button>
+          </div>
+        </div>
+
+        <div class="chat" id="chat">
+          <div id="loading">reading your echoes ···</div>
+          <div id="error"></div>
+        </div>
+
+        <div class="input-bar">
+          <div class="input-pill">capture via HTTP Shortcuts ···</div>
+          <div class="send-btn">↑</div>
+        </div>
+      </div>
+
+      <!-- RIGHT DRAWER -->
+      <div class="right-drawer" id="right-drawer">
+        <div class="drawer-header">
+          <div class="drawer-thought-title" id="drawer-thought-title">—</div>
+          <button class="drawer-close" id="drawer-close">✕</button>
+        </div>
+
+        <div class="drawer-meta-grid">
+          <div class="dm-col"><span class="dm-label">voltage</span><span class="dm-value" id="dm-voltage">—</span></div>
+          <div class="dm-col"><span class="dm-label">conf</span><span class="dm-value" id="dm-confidence">—</span></div>
+          <div class="dm-col"><span class="dm-label">time</span><span class="dm-value" id="dm-time">—</span></div>
+          <div class="dm-col"><span class="dm-label">source</span><span class="dm-value" id="dm-source">—</span></div>
+        </div>
+
+        <div class="drawer-body">
+          <div class="drawer-echo">
+            <div class="drawer-echo-label">echo</div>
+            <div class="drawer-echo-text" id="drawer-echo-text">—</div>
+          </div>
+          <!-- note section hidden: .drawer-ask { display: none } -->
+          <div class="drawer-ask">
+            <div class="drawer-ask-label">note</div>
+            <textarea class="drawer-note" placeholder="go further..."></textarea>
+          </div>
+        </div>
+
+        <div class="drawer-capture">
+          <div class="drawer-capture-pill">capture via Slack ···</div>
+          <div class="drawer-capture-btn">↑</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!--
+      All logic in DOMContentLoaded — guarantees:
+      1. DOM is fully parsed before we query any element
+      2. window.supabase (loaded in <head>) is available
+    -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+
+        var sb = window.supabase.createClient(
+          'https://nlfryozynimffhwkhhls.supabase.co',
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sZnJ5b3p5bmltZmZod2toaGxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTExMDAsImV4cCI6MjA4ODEyNzEwMH0.VWLopIlZi7ad6MNA84LEo7ztiWBylzJ6g5Y1jHav1zw'
+        );
+
+        var app          = document.getElementById('app');
+        var chat         = document.getElementById('chat');
+        var mainView     = document.getElementById('main-view');
+        var loadingEl    = document.getElementById('loading');
+        var errorEl      = document.getElementById('error');
+        var drawerClose  = document.getElementById('drawer-close');
+        var filterToggle = document.getElementById('filter-toggle');
+        var filterWrap   = document.getElementById('filter-wrap');
+
+        var allThoughts  = [];
+        var activeFilter = 'all';
+        var activeHeldId = null;
+
+        /* ── helpers ── */
+        function voltageFrom(state) {
+          if (state === 1) return 'life';
+          if (state === 2) return 'upset';
+          if (state === 0) return 'task';
+          return 'none';
+        }
+        var LABEL = { life: 'HI', upset: 'LO', task: 'TASK', none: 'RAW' };
+
+        function fmtDate(iso) {
+          if (!iso) return '—';
+          var d = new Date(iso);
+          var now = new Date(); now.setHours(0,0,0,0);
+          var yest = new Date(now); yest.setDate(now.getDate() - 1);
+          var day  = new Date(d);  day.setHours(0,0,0,0);
+          if (+day === +now)  return 'today';
+          if (+day === +yest) return 'yesterday';
+          return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+        }
+
+        /* item a: no trailing Z */
+        function fmtTime(iso) {
+          if (!iso) return '—';
+          var d = new Date(iso);
+          return String(d.getUTCHours()).padStart(2,'0') + ':' +
+                 String(d.getUTCMinutes()).padStart(2,'0');
+        }
+
+        function esc(str) {
+          return String(str || '')
+            .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+
+        /* ── fetch: descending + reverse + limit 50 ── */
+        function fetchThoughts() {
+          sb.from('thoughts')
+            .select('id, content, created_at, trinary_state, device, input_type, metadata')
+            .order('created_at', { ascending: false })
+            .limit(50)
+            .then(function(result) {
+              loadingEl.style.display = 'none';
+              if (result.error) {
+                errorEl.style.display = 'block';
+                errorEl.textContent = 'fetch error: ' + result.error.message;
+                return;
+              }
+              /* reverse so oldest is at top, newest at bottom */
+              allThoughts = (result.data || []).reverse();
+              var n = allThoughts.length;
+              document.getElementById('nav-sub').textContent =
+                n + ' echo' + (n !== 1 ? 's' : '') + ' · v082';
+              render();
+            });
+        }
+
+        /* ── filter ── */
+        function filtered() {
+          if (activeFilter === 'life')     return allThoughts.filter(function(t){ return t.trinary_state === 1; });
+          if (activeFilter === 'upset')    return allThoughts.filter(function(t){ return t.trinary_state === 2; });
+          if (activeFilter === 'task')     return allThoughts.filter(function(t){ return t.trinary_state === 0; });
+          if (activeFilter === 'null')     return allThoughts.filter(function(t){ return t.trinary_state == null; });
+          if (activeFilter === 'mobile')   return allThoughts.filter(function(t){ return t.device === 'mobile'; });
+          if (activeFilter === 'computer') return allThoughts.filter(function(t){ return t.device === 'computer'; });
+          return allThoughts;
+        }
+
+        /* ── render ── */
+        function render() {
+          var thoughts = filtered();
+          var html = '';
+          var lastDate = null;
+
+          /* empty state */
+          if (thoughts.length === 0) {
+            chat.innerHTML = '<div class="empty-state">no echoes yet ···</div>';
+            return;
+          }
+
+          thoughts.forEach(function(t) {
+            var date = fmtDate(t.created_at);
+            if (date !== lastDate) {
+              html += '<div class="date-sep">' + date + '</div>';
+              lastDate = date;
+            }
+            var v        = voltageFrom(t.trinary_state);
+            var lbl      = LABEL[v];
+            var meta     = t.metadata || {};
+            var analysis = (meta.analysis && meta.analysis.trim()) ? meta.analysis : null;
+
+            /* echo preview: 1-line truncated, or ◌ reading... */
+            var echoPreview = analysis
+              ? '<div class="bubble-echo-preview">' + esc(analysis) + '</div>'
+              : '<div class="bubble-echo-preview">◌ reading...</div>';
+
+            /* ask link rendered always; CSS shows it only when expanded + data-has-echo=1 */
+            var askLink = '<div class="bubble-ask-link">ask about this ›</div>';
+
+            html +=
+              '<div class="msg visible new-group">' +
+                '<div class="bubble v-' + v + '" data-id="' + esc(t.id) + '" data-has-echo="' + (analysis ? '1' : '0') + '">' +
+                  '<div class="bubble-txt">' + esc(t.content) + '</div>' +
+                  echoPreview +
+                  askLink +
+                  '<div class="bubble-foot">' +
+                    '<span class="b-time">' + fmtTime(t.created_at) + '</span>' +
+                    '<span class="b-state st-' + v + '">' + lbl + '</span>' +
+                    '<span style="color:var(--dim);font-size:9px;margin-left:auto">' +
+                      esc(t.input_type || '') +
+                    '</span>' +
+                  '</div>' +
+                '</div>' +
+              '</div>';
+          });
+
+          chat.innerHTML = html;
+          chat.scrollTop = chat.scrollHeight;
+          wire(thoughts);
+        }
+
+        /* ── wire interactions ── */
+        function wire(thoughts) {
+          chat.querySelectorAll('.bubble').forEach(function(bubble) {
+            var id      = bubble.dataset.id;
+            var askLink = bubble.querySelector('.bubble-ask-link');
+
+            bubble.addEventListener('click', function(e) {
+              if (askLink && askLink.contains(e.target)) return;
+
+              var isExpanded = bubble.classList.contains('expanded');
+
+              /* collapse all others */
+              chat.querySelectorAll('.bubble.expanded').forEach(function(b) {
+                if (b !== bubble) b.classList.remove('expanded');
+              });
+
+              if (isExpanded) {
+                /* tap expanded bubble → collapse */
+                bubble.classList.remove('expanded');
+                /* if this bubble was held, close drawer too */
+                if (activeHeldId === id) {
+                  closeDrawer();
+                }
+              } else {
+                bubble.classList.add('expanded');
+              }
+            });
+
+            if (askLink) {
+              askLink.addEventListener('click', function(e) {
+                e.stopPropagation();
+                /* only open if bubble has echo */
+                if (bubble.dataset.hasEcho === '1') {
+                  openDrawer(id, thoughts, bubble);
+                }
+              });
+            }
+          });
+        }
+
+        /* ── drawer ── */
+        function openDrawer(thoughtId, thoughts, bubbleEl) {
+          var t = thoughts.find(function(x){ return x.id === thoughtId; });
+          if (!t) return;
+
+          /* clear previous active-held */
+          chat.querySelectorAll('.bubble.active-held').forEach(function(b) {
+            b.classList.remove('active-held');
+          });
+
+          /* set new active-held */
+          if (bubbleEl) bubbleEl.classList.add('active-held');
+          activeHeldId = thoughtId;
+
+          var v        = voltageFrom(t.trinary_state);
+          var lbl      = LABEL[v];
+          var meta     = t.metadata || {};
+          var conf     = meta.confidence != null ? Number(meta.confidence).toFixed(2) : '—';
+          var analysis = (meta.analysis && meta.analysis.trim()) ? meta.analysis : null;
+
+          app.classList.remove('v-life','v-upset','v-task','v-none');
+          app.classList.add('v-' + v, 'drawer-open');
+
+          document.getElementById('drawer-thought-title').textContent = t.content || '';
+
+          var dmV = document.getElementById('dm-voltage');
+          dmV.textContent = lbl;
+          dmV.className = 'dm-value st-' + v;
+
+          document.getElementById('dm-confidence').textContent = conf;
+          document.getElementById('dm-time').textContent = fmtTime(t.created_at);
+          document.getElementById('dm-source').textContent = meta.source || t.input_type || '—';
+
+          var echoEl = document.getElementById('drawer-echo-text');
+          if (analysis) {
+            echoEl.textContent = analysis;
+            echoEl.className = 'drawer-echo-text';
+          } else {
+            echoEl.innerHTML = '<span class="drawer-echo-empty">◌ reading the signal ···</span>';
+            echoEl.className = 'drawer-echo-text';
+          }
+        }
+
+        function closeDrawer() {
+          app.classList.remove('drawer-open','v-life','v-upset','v-task','v-none');
+          chat.querySelectorAll('.bubble.active-held').forEach(function(b) {
+            b.classList.remove('active-held');
+          });
+          activeHeldId = null;
+        }
+
+        /* ✕ button */
+        drawerClose.addEventListener('click', closeDrawer);
+
+        /* tap outside drawer (on main-view) closes drawer */
+        mainView.addEventListener('click', function(e) {
+          if (app.classList.contains('drawer-open')) {
+            closeDrawer();
+          }
+        });
+
+        /* ── filter chips ── */
+        var chipMap = {
+          all:'a-all', life:'a-life', upset:'a-up',
+          task:'a-task', null:'a-up', mobile:'a-mob', computer:'a-mob'
+        };
+        document.querySelectorAll('.chip').forEach(function(chip) {
+          chip.addEventListener('click', function() {
+            activeFilter = chip.dataset.f;
+            document.querySelectorAll('.chip').forEach(function(c){ c.className = 'chip'; });
+            chip.classList.add(chipMap[activeFilter] || 'a-all');
+            render();
+          });
+        });
+
+        filterToggle.addEventListener('click', function() {
+          filterWrap.classList.toggle('open');
+        });
+
+        /* ── init ── */
+        fetchThoughts();
+
+      }); // end DOMContentLoaded
+    </script>
+  </body>
+</html>
