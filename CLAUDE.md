@@ -144,6 +144,39 @@ Stopped at: [one sentence]
 Resume at: [one sentence — next action]
 ```
 
+### Main branch protection
+
+**The principle:** Main is delicate. It holds the session record only (immutable, safe).
+
+**What can push to main:** Only `sessions/*.md` files (session records and INDEX).
+- `sessions/session-N.md` — sealed session record
+- `sessions/INDEX.md` — chronological index
+
+**What cannot push to main:** Everything else.
+- Design work (`design/mockups/*.html`, `.jsx`)
+- Code changes (`supabase/functions/*`, `architecture/*`)
+- Configuration (`package.json`, `.env`, etc.)
+
+**How it's enforced (protocol, not hook):**
+Design/code work stays on session branches. Merging to main requires:
+1. Open a PR from session branch → main
+2. User reviews the diff
+3. User approves and merges via GitHub
+
+Never commit from the root repo path (`/know-accept-create/`) — it will
+land on whatever branch that checkout is on (usually `main`).
+
+### Safe commits (emergency main fixes only)
+
+Direct commits to `main` bypass session protocol. Use only for:
+- Critical bugs that break the build
+- Security patches requiring immediate deployment
+- Emergency typo/config fixes
+
+All other work: session branch → PR workflow.
+
+Prefix: `safe: description`
+
 ## Commit convention
 
 | Prefix | Use |
