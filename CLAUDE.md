@@ -22,6 +22,34 @@ The repo is intentionally public. The documentation trail is the gold.
   committed to the repo and the chat gets archived. The repo is the memory.
   Claude is the workspace.
 
+### One session — one branch
+
+**The invariant:** One session = one branch = one chat = one Notion page (if active).
+They open together and seal together. A branch is not closed until the session file is
+committed on it, the PR is merged to main, and the chat is archived.
+
+**What "sealed" means:**
+- Session `.md` file committed on the session branch
+- `sessions/INDEX.md` updated
+- PR merged to `main`
+- Branch deleted locally and on remote
+- Chat archived
+- Notion page (if any) marked done
+
+**At session open — Claude must confirm:**
+1. What is the current session number?
+2. What is the active worktree path? (`git worktree list`)
+3. Is the worktree branch named for this session (e.g. `claude/s52-...`)?
+4. Is the root repo checkout on `main`?
+
+If any of these are wrong, fix before doing any work.
+
+**Commit discipline:**
+All session commits go in the session worktree only.
+Never commit from the root repo path (`/know-accept-create/`) — it will land on `main`
+or whatever stale branch is checked out there.
+Root path = read-only reference. Worktree path = write.
+
 ### Branch deletion invariant
 
 **User commitment:** Never delete a branch manually without asking Claude to read it first.
@@ -79,21 +107,32 @@ One gets promoted to the next session's primary thread.
 
 ### Close ritual
 
-1. Write the session `.md` file using the template
+1. Write the session `.md` file using the template (in the session worktree)
 2. Append a `## Handoff -> Session N+1` block to the session file
 3. Update `sessions/INDEX.md` — one line: `N. Mon DD — One-line summary`
-4. **Branch cleanup:** One branch per session. Before pushing:
-   - Verify all meaningful work is committed and on `main` or the session branch
-   - Delete stale worktree branches locally and on remote (e.g., `git push origin --delete branch-name`)
-   - Keep only the current session branch active during work; delete it once sealed
-   - `youthful-raman` is reserved for user-only local work — never force-push or delete without explicit confirmation
-5. Commit both in one push:
+4. Commit both in one push **from the session worktree**:
    ```bash
    git add sessions/session-N.md sessions/INDEX.md
    git commit -m "sessions: SN sealed"
    git push
    ```
-6. Archive this chat. Open a new one for the next session.
+5. Open PR → merge to `main`
+6. Delete branch locally and on remote:
+   ```bash
+   git push origin --delete claude/sN-branch-name
+   git worktree remove .claude/worktrees/branch-name
+   git branch -D claude/sN-branch-name
+   ```
+7. Verify root repo is on `main` and `git worktree list` shows only `main`:
+   ```bash
+   cd /know-accept-create && git checkout main && git pull
+   git worktree list   # should show only main path
+   ```
+8. Archive this chat. Open a new one for the next session.
+9. If Notion page is active for this session: mark it done.
+
+**The branch is not deleted until steps 4–5 are complete.
+The chat is not archived until step 6 is verified.**
 
 ### Interruption protocol
 
