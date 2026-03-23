@@ -72,6 +72,7 @@ A chronological narrative of each session. A witnessed record of how the system 
 68. Mar 21 — Proto-Lab born; KW/WP diagnosed (10d silent); The Magician's Score created
 69. Mar 21 — v083 shipped (voltage fix + 78% width); Pre-flight rule locked; card format proven
 70. Mar 21 — Branch hygiene + dangling artifact rescue + CLAUDE.md hardened; INDEX backfilled
+76. Mar 23 — Hygiene as entropy dissipation — branch cleanup, 5 protocol clarifications enforced
 
 ---
 
