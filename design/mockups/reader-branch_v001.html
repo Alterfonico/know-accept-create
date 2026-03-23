@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiet Thread</title>
+  <style>
+    :root {
+      --bg: #f6f0e6;
+      --paper: #fbf7f1;
+      --bubble: #f2eadf;
+      --text: #2b2621;
+      --muted: #8e8376;
+      --line: #d8cbbd;
+      --shadow: 0 8px 24px rgba(70, 52, 32, 0.06);
+      --radius: 24px;
+      --content-width: 600px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+      line-height: 1.65;
+    }
+
+    .thread {
+      position: relative;
+      max-width: var(--content-width);
+      margin: 0 auto;
+      padding: 72px 24px 120px;
+      min-height: 100vh;
+    }
+
+    .thread::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 72px;
+      width: 1px;
+      background: var(--line);
+      opacity: 0.9;
+    }
+
+    .entry {
+      position: relative;
+      display: flex;
+      justify-content: flex-end;
+      margin: 0 0 72px 0;
+    }
+
+    .bubble {
+      position: relative;
+      width: min(100%, 460px);
+      background: var(--bubble);
+      border-radius: var(--radius);
+      padding: 24px 24px 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(120, 95, 68, 0.08);
+    }
+
+    .bubble::after {
+      content: "";
+      position: absolute;
+      right: -36px;
+      top: 32px;
+      width: 24px;
+      height: 1px;
+      background: var(--line);
+    }
+
+    .meta {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      letter-spacing: 0.01em;
+    }
+
+    .voice {
+      font-weight: 600;
+      color: inherit;
+    }
+
+    .time {
+      font-weight: 400;
+      white-space: nowrap;
+    }
+
+    .content {
+      font-size: 1.2rem;
+    }
+
+    .content p {
+      margin: 0;
+    }
+
+    .content p + p {
+      margin-top: 1em;
+    }
+
+    @media (max-width: 720px) {
+      .thread {
+        padding: 48px 18px 96px;
+      }
+
+      .thread::before {
+        right: 36px;
+      }
+
+      .bubble {
+        width: min(100%, 100%);
+        padding: 20px 20px 18px;
+      }
+
+      .bubble::after {
+        right: -20px;
+        width: 14px;
+      }
+
+      .content {
+        font-size: 1.08rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="thread">
+    <article class="entry">
+      <section class="bubble">
+        <div class="meta">
+          <span class="voice">Mobile</span>
+          <time class="time">12:24</time>
+        </div>
+        <div class="content">
+          <p>new signal</p>
+        </div>
+      </section>
+    </article>
+
+    <article class="entry">
+      <section class="bubble">
+        <div class="meta">
+          <span class="voice">Mobile</span>
+          <time class="time">20:55</time>
+        </div>
+        <div class="content">
+          <p>ascii art instead of visualize</p>
+        </div>
+      </section>
+    </article>
+
+    <article class="entry">
+      <section class="bubble">
+        <div class="meta">
+          <span class="voice">Calibration</span>
+          <time class="time">21:12</time>
+        </div>
+        <div class="content">
+          <p>zero</p>
+        </div>
+      </section>
+    </article>
+
+    <article class="entry">
+      <section class="bubble">
+        <div class="meta">
+          <span class="voice">Calibration</span>
+          <time class="time">21:12</time>
+        </div>
+        <div class="content">
+          <p>one</p>
+        </div>
+      </section>
+    </article>
+
+    <article class="entry">
+      <section class="bubble">
+        <div class="meta">
+          <span class="voice">Mobile</span>
+          <time class="time">21:18</time>
+        </div>
+        <div class="content">
+          <p>i’m about to list opportunity areas below</p>
+        </div>
+      </section>
+    </article>
+
+    <article class="entry">
+      <section class="bubble">
+        <div class="meta">
+          <span class="voice">Mobile</span>
+          <time class="time">21:18</time>
+        </div>
+        <div class="content">
+          <p>like the fact that the time should be bottom right of the bubble</p>
+        </div>
+      </section>
+    </article>
+  </main>
+</body>
+</html>
