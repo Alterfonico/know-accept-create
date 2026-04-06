@@ -1,50 +1,106 @@
-A personal iteration ledger. Documents the process of building Meverse — a self-reflection and pattern-recognition system.
+# CLAUDE.md
 
-**Source of truth:** Notion (live state, decisions, session logs)
+<!-- version: 1.5 | born: S99 | updated: S101 | cadence: monthly | edit: Maya only -->
 
-**This repo:** Mirror — runnable artifacts and current reference docs only.
-
----
-
-## Structure
-
-```javascript
-know-accept-create/
-├── CLAUDE.md          ← you are here
-├── TOOLS/             ← ingredients: skills, prompts, functions
-└── DATA/              ← iterations: sessions, logs, decisions, designs
-    └── _archive/      ← old versions, experiments, retired prototypes
-```
-
-## TOOLS/
-
-What runs the system. Skills for AI agents, Supabase edge functions, Claude config.
-
-## DATA/
-
-What the system produced. Session logs, architecture decisions, design iterations, daily logs.
-
-History lives in `_archive/` — do not prune it, do not route by it.
+Lean compass. Read at cold-start. For addresses -> DIRECTORY.md (grep it, don't read top-to-bottom). For style -> /system/identity/.
 
 ---
 
-## The Job
+## What This System Is
 
-Two questions this repo helps answer:
+A personal operating system for compounding knowledge and reducing entropy across sessions.
+The conductor is stateless. The system is not. Leave no gaps at close.
 
-1. Are we drifting (distraction) or moving (Kaizen)?
-2. What changed, when, and why?
+Two environments. One system:
+- **Notion** -- session canvas, INDEX, LAB, LOGS. Truth lives here.
+- **Proto-Lab** -- local Claude Code workspace. Follows /workspace map (router.md -> /ram . /system . /library . /flow).
 
----
-
-## Notion Links
-
-- INDEX: https://www.notion.so/2ef9e35687288000ba87ff09f3a74c7d
-- Sessions: LOGS > SESSIONS database
-- Live tensions: INDEX > Active tensions
+These are parallel, not redundant. Notion holds decisions. Proto-Lab executes them.
+Current work state -> INDEX ## Current Handoff. Find INDEX address -> DIRECTORY notion.index.
 
 ---
 
-## For a new Claude instance
+## Loading Model
 
-Boot from Notion INDEX. Read ## Current Handoff. Do not read this repo as source of truth for project state — Notion is the source.
+**Always loaded:** This file. Nothing else by default.
+**Load on demand:** DIRECTORY.md (navigation), /system/ (how to act), /library/ (deep context).
+**Never load by default:** /library/episodic/, session history, full skills folder.
+
+Rule: before navigating unfamiliar territory, read DIRECTORY.md first. Never guess paths.
+
+---
+
+## The Ring
+
+GPAEU -- output feeds back to intake. The ring never breaks.
+
+| Step | Phase    | Job                                                        |
+|------|----------|------------------------------------------------------------|
+| G    | INTENT   | What to build or solve                                     |
+| P    | THINK    | Plan before you build                                      |
+| A    | BUILD    | Execute -- DRSE inside this phase                          |
+| E    | EVALUATE | Did it work? QA-1 and QA-2 run here                        |
+| U    | UPDATE   | Fold the verdict back into the system. Ring closes when something changes. |
+
+QA is a permanent rail, not a phase. Runs at E and at every checkpoint.
+
+---
+
+## Conductor Contract
+
+1. Stateless -- no memory across sessions
+2. Boot from CLAUDE.md -> DIRECTORY.md only if needed
+3. Leave zero gaps at close -- write IF_I_DIE_HERE before dying
+4. Destructive action -> show what will be deleted -> wait for confirmation -> execute
+5. Route without confirm is a governance violation
+
+---
+
+## Session Rhythm
+
+awake -> checkpoint(s) -> close -> seal
+- awake: conductor opens, reads INDEX ## Current Handoff, creates session page
+- checkpoint: append K-block to session canvas. Never edit prior blocks.
+- close: conductor writes What Happened + Produced + Open Question + updates INDEX
+- seal: Maya's action only. Conductor never seals.
+
+---
+
+## Nursery Gate
+
+Every artifact is born here. The family (Father/Mother/Validator_Twin/Builder_Twin) checks four things before it leaves the nursery. Twin contracts -> /system/identity/constraints.md (MISSING).
+Habitat / Hands / Rail / Proof -- all four must be answered. No ungated artifacts ship.
+
+---
+
+## SHIP Checklist
+
+1. Output -> final folder / Notion LAB or LOGS
+2. DIRECTORY.md updated
+3. Ring closure confirmed
+4. Session sealed
+5. INDEX ## Current Handoff replaced (never appended)
+
+---
+
+## Glossary
+
+- **Maya** -- the human conductor and sole owner of this system. Seal is Maya's action only.
+- **DRSE** -- execution engine inside Phase A: Discover -> Reason -> Synthesise -> Execute.
+- **K-block** -- timestamped checkpoint appended to session canvas: Resolved / Open / IF_I_DIE_HERE.
+- **QA-1** -- gate after Arena/Think, before Build: is DONE_WHEN falsifiable? Is SCOPE_OUT named?
+- **QA-2** -- gate after Build: does output satisfy DONE_WHEN? If no -> delta back to Plan.
+- **Routing** -- transitioning work from one phase or agent to the next. Always requires explicit confirm.
+- **Habitat** -- where the artifact will live (Notion LAB, LOGS, Proto-Lab folder).
+- **Proof** -- the falsifiable condition that confirms the artifact works as intended.
+- **Hat** -- a skill recipe file containing a full GPAEU loop: outcome, utensils, ingredients, instructions, taste score (QA-2), nutritional value (asymptote contribution), and resource budget.
+
+---
+
+## Missing (update when gaps open or close)
+
+- [ ] /system/identity/ -- principles.md, constraints.md, style.md not yet written
+- [ ] Proto-Lab /workspace -- router.md blocked by identity folder
+- [ ] MAX_RETRIES -- exit gate value not set
+- [ ] Async failure paths -- Generator + Evaluator have none
+- [ ] Asymptote -- not yet formally defined (blocks Hat nutritional value scoring)
